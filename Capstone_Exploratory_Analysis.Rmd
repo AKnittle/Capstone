@@ -1,0 +1,248 @@
+---
+title: "Capstone: Exploratory Analysis"
+author: "Andrew Knittle"
+date: "`r paste('Generated on', Sys.Date())`" 
+output: 
+  html_document: 
+    # try readable or cosmo
+    # default (default), try kable, tibble, or paged as an option
+    # Options are none (default), show, and hide
+    # default is null, try my_style_file.css
+    toc: TRUE
+    toc_depth: 3
+    toc_float: FALSE
+    highlight: haddock
+    theme: flatly
+    df_print: paged
+    code_folding: none
+    self_contained: TRUE
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+set.seed(123)
+# Load all of the libraries that we need for the document.
+library(pacman)
+p_load(ggplot2)
+p_load(dplyr)
+p_load(psych)
+p_load(ggpubr)
+p_load(kableExtra)
+p_load(corrplot)
+# Read Data
+setwd("C:/Users/aknit/Documents/Grad School/Capstone")
+dustData_Reduced = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=','))
+
+# --------------------------------------
+# Read helper script
+source("Exploratory_Support_Scripts.R")
+
+```
+
+# Exploration
+
+Before any analysis can be done we should explore the data to get a sense of what we're looking at. Since there are 333 variables in this dataset I'll be reducing the data set down to a few variables to help paint some broad strokes in my mind.
+
+```{r Exploration, echo=FALSE, fig.cap= "Exploration", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+# TODO:
+# CASESTAT: 0 is control, 1 is case (contracted cancer)
+# Do NOT worry about probability of exposure
+# Detect Total: Throw out
+# Probability Exposure: Throw out
+# Look at only 1st Imputation; [Chemical Compound]_1
+
+
+# ===============================================================
+
+# Make a vector of variables we're interested in
+# exploratoryVars <- as.vector(c("SITE", "CASESTAT", "GENDER", "AGE_REF", "EDUCG3", "RACEG3"))
+# dustData_Reduced <- dustData %>% select(-contains("_10"))
+# dustData_Reduced <- dustData_Reduced %>% select(contains("_1"))
+# 
+chemList <- colnames(dustData_Reduced)[2:27]
+
+# Just to make this a bit more portable in the future I'll make this a method for
+# getting dataframe data with specific vars
+# getDustVars <- function(df=dustData, varVec){
+#   result <- df[,varVec]
+#   return(result)
+# }
+
+#dustData_Reduced <- getDustVars(varVec = exploratoryVars)
+# dustData_Reduced$AGE_REF <- dustData$AGE_REF
+# dustData_Reduced$SITE <- as.factor(dustData$SITE)
+# dustData_Reduced$CASESTAT <- as.factor(dustData$CASESTAT)
+# dustData_Reduced$GENDER <- as.factor(dustData$GENDER)
+# dustData_Reduced$RACEG3 <- as.factor(dustData$RACEG3)
+
+# write.csv(dustData_Reduced, "dustData_Reduced.csv")
+
+
+# --------------------------------------------------------
+# Plots
+
+
+# Histogram of Age Groups with Gender
+ggplot(dustData_Reduced) +
+ aes(x = AGE_REF, fill = GENDER, colour = GENDER) +
+ geom_histogram(bins = 30L) +
+ scale_fill_hue() +
+ scale_color_hue() +
+ labs(x = "Age", y = "Count", title = "Histogram of Age with Gender") +
+ theme_minimal()
+
+
+# Casetat per Site
+# No drastic differences noted
+ggplot(dustData_Reduced) +
+ aes(x = CASESTAT, fill = CASESTAT) +
+ geom_bar() +
+ scale_fill_hue() +
+ theme_minimal() +
+ facet_wrap(vars(SITE))
+
+# Controls
+# Female: 240
+# Male: 273
+# -----------
+# Female: 0
+# Male: 1
+table(dustData_Reduced$GENDER, dustData_Reduced$CASESTAT)
+
+```
+
+
+```{r Exploration 2, echo=FALSE, fig.cap= "Exploration 2", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+
+# Plot histograms for each chemical given in the list and differentiate between cases
+chemicalCasesHist <- function(chems){
+  # Loops through all the chems given
+  chemPlots <- c()
+  for(i in chems){
+    
+    chemGraph <- ggplot(dustData_Reduced) +
+     aes(x = log10(dustData_Reduced[,i] +1), fill = CASESTAT) +
+     geom_histogram(bins = 30L) +
+     scale_fill_hue() +
+     ylim(0, 650) +
+     labs(y = "Count", title = "Chemical Per Case", x=i) +
+     theme_minimal()
+     # facet_wrap(vars(CASESTAT))
+    
+    print(chemGraph)
+    # chemPlots <- c(chemPlots, chemGraph)
+    
+  }
+  # chemPlots <- as.list(chemPlots)
+  # chemGridGraph <- ggarrange(ncol = 3, nrow = 9, plotlist = chemPlots)
+  # print(chemGridGraph)
+   
+}
+
+chemicalCasesHist(chemList)
+
+
+
+```
+
+
+
+
+TODO: What's up with Carbaryl and Diazinon
+
+
+
+
+5/6/21
+TODO:
+Look into CreateTableOne
+  Look at differences between groups
+  Start Modeling
+    Univariate Stat Regression
+    Build model; Logistical, LDA, Decision Trees (Conditional Decision Trees, Package Partykit->cpart), Lasso
+  Would be worth looking at coorelation between chems 
+    Coorelation Matrices
+    Use log+1 scale
+  Kernel Methods
+    Using kernel as a way to finding predictors
+    Kernal methods for mixtures
+      Bayesian (Biostatistics, multipollutent mixture)
+  Weighted Quantile Sum Regression
+    David Wheiler Paper (Check the Google Drive)
+      Sum score for all chems
+        Use the one score for logistic regression
+  HW: write up (Set Goals, How we do comparisons, etc.), EDA, Matrix correlation, table 
+    Know how we are going to compare models; cross validation, AIC, and others
+    Due: 5/11/21
+  
+
+```{r Exploration 3, echo=FALSE, fig.cap= "Exploration 3", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+# Making log transformed values for all chem values 
+
+logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
+# logDustData <- dustData_Reduced
+# logDustData[chemList] <- lapply(logDustData[chemList], function(x) log10(x+1))
+logDustData <- logDustData[-1]
+extraVars <- as.vector(c("SITE", "GENDER", "AGE_REF", "RACEG3"))
+logDustData <- select(logDustData,-X)
+logDustData <- select(logDustData, -extraVars)
+#write.csv(logDustData, "logDustData_Reduced.csv")
+
+
+# Plot correlations of just chems
+corChems <- cor(logDustData[chemList])
+# corrplot(corChems, method="number")
+naiveCorVars <- corMatrixReader(0.95, dataSet = corChems)
+
+naiveCorVars$varA <- as.factor(naiveCorVars$varA)
+naiveCorVars$varB <- as.factor(naiveCorVars$varB)
+naiveCorVars$Correlation <- as.numeric(naiveCorVars$Correlation)
+
+ggplot(naiveCorVars) +
+ aes(x = Correlation, y = Correlation, colour = varB) +
+ geom_point(size = 3L) +
+ scale_color_hue() +
+ theme_classic() +
+ scale_x_continuous(limits = c(0.9, 1)) +
+ scale_y_continuous(limits = c(0.9, 1)) +
+ facet_wrap(vars(varA))
+
+
+
+# Make a naive logistic model for all chems
+logModel1 <- glm(CASESTAT ~ ., data = logDustData, family = "binomial")
+
+#---------------------------------------------------------------------------------
+# Fix Window sizing
+# par(mar=c(1,1,1,1))
+# resize.win <- function(Width=6, Height=6)
+# {
+#     # works for windows
+#     dev.off(); # dev.new(width=6, height=6)
+#     windows(record=TRUE, width=Width, height=Height)
+# }
+
+# Plot the correlation plot
+# terms=names(logModel1$coefficients)[-1] #Extract the variable names
+# ind=which(names(logDustData)%in%terms) #Get the column numbers of the variables in the model
+# pairPlot1 <- pairs.panels(logDustData[ind],
+#              method = "pearson", # correlation method
+#              hist.col = "darkorchid",
+#              density = TRUE, # show density plots
+#              ellipses = TRUE) # show correlation ellipses
+# 
+# resize.win(10,10)
+# pairPlot1
+
+```
+
+
+
+
+
+
+
+
