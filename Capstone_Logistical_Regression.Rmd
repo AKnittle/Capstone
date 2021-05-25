@@ -29,15 +29,56 @@ p_load(psych)
 p_load(ggpubr)
 p_load(kableExtra)
 p_load(corrplot)
+
+# --------------------------------------
 # Read Data
 setwd("C:/Users/aknit/Documents/Grad School/Capstone")
 dustData_Reduced = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=','))
+dustData_Reduced <- dustData_Reduced[-1]
+logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
+logDustData <- logDustData[-1]
+
+train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))
+test_DustData <-  as.data.frame(read.csv('Data/Testing Set_0.1_May 25 2021.csv',header=T,sep=','))
 
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
+source("Script_Library.R")
+
+
 
 ```
+
+
+
+```{r Correlation Matrix, echo=FALSE, fig.cap= "Correlation Matrix", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+
+
+# Correlation matrix
+# Probably looking at one of the Benz ones
+cor(dustData_Reduced[1:26], use="complete.obs")
+corrplot(cor(dustData_Reduced[1:26], use="complete.obs"))
+# corrplot(M, method="circle")
+# http://www.sthda.com/english/wiki/visualize-correlation-matrix-using-correlogram
+
+
+```
+
+
+
+```{r Picking Our Variables, echo=FALSE, fig.cap= "Picking Our Variables", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+
+
+
+```
+
+
+
+
+
 
 
 
