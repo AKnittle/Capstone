@@ -19,9 +19,13 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+# --------------------------------------
+# Clean and Prep Environment
 rm(list=ls())
 set.seed(123)
-# Load all of the libraries that we need for the document.
+
+# --------------------------------------
+# Load Libraries
 library(pacman)
 p_load(ggplot2)
 p_load(dplyr)
@@ -38,8 +42,8 @@ dustData_Reduced <- dustData_Reduced[-1]
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
 
-train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))
-test_DustData <-  as.data.frame(read.csv('Data/Testing Set_0.1_May 25 2021.csv',header=T,sep=','))
+train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
+test_DustData <-  as.data.frame(read.csv('Data/Testing Set_0.1_May 25 2021.csv',header=T,sep=','))[-1]
 
 # --------------------------------------
 # Read helper script
@@ -53,7 +57,6 @@ source("Script_Library.R")
 
 
 ```{r Correlation Matrix, echo=FALSE, fig.cap= "Correlation Matrix", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
-
 
 
 # Correlation matrix
