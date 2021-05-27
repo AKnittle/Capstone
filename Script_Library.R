@@ -34,6 +34,37 @@ getSets <- function(dataset, propTraining = 0.9){
 # -------------------------------------------------------------
 # Cross Validation:
 
+cost.fn <- function(tol = 0.5, obs.response, fitted.probability) {
+  
+  t <- tibble(obs = obs.response, prob = fitted.probability.)
+  # count number of false positives
+  n.fp <- t %>%
+    filter(obs == 0 & prob > tol) %>%
+    nrow()
+  # false negatives
+  n.fn <- t %>%
+    filter(obs == 1 & prob < tol) %>%
+    nrow()
+  return(error.rate <- (n.fp + n.fn)/nrow(t))
+}
+
+
+# TODO: Fix
+roughPerformanceTest <- function(testSet, dependentVar, givenModel){
+  
+  testSet <- na.omit(testSet)
+  
+  # Make predictions
+  probabilities <- predict(givenModel, testSet, type = "response")
+  predicted.classes <- ifelse(probabilities > 0.5, 1, 0)
+  # Prediction accuracy
+  observed.classes <- testSet[, dependentVar]
+  avgAcc <- mean(predicted.classes == observed.classes)
+  
+  return(avgAcc)
+  
+}
+
 
 
 

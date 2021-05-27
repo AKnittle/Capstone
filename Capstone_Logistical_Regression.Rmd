@@ -28,22 +28,30 @@ set.seed(123)
 # Load Libraries
 library(pacman)
 p_load(ggplot2)
+p_load(ISLR)
 p_load(dplyr)
 p_load(psych)
 p_load(ggpubr)
 p_load(kableExtra)
 p_load(corrplot)
+p_load(tidyverse)
+p_load(caret)
+p_load(MASS)
 
 # --------------------------------------
 # Read Data
 setwd("C:/Users/aknit/Documents/Grad School/Capstone")
 dustData_Reduced = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=','))
 dustData_Reduced <- dustData_Reduced[-1]
+dustData_Reduced$CASESTAT <- as.factor(dustData_Reduced$CASESTAT)
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
+logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
+train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
 test_DustData <-  as.data.frame(read.csv('Data/Testing Set_0.1_May 25 2021.csv',header=T,sep=','))[-1]
+test_DustData$CASESTAT <- as.factor(test_DustData$CASESTAT)
 
 # --------------------------------------
 # Read helper script
@@ -54,14 +62,14 @@ source("Script_Library.R")
 
 ```
 
-
+# Exploring the Data
 
 ```{r Correlation Matrix, echo=FALSE, fig.cap= "Correlation Matrix", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 
 # Correlation matrix
 # Probably looking at one of the Benz ones
-cor(dustData_Reduced[1:26], use="complete.obs")
+#cor(dustData_Reduced[1:26], use="complete.obs")
 corrplot(cor(dustData_Reduced[1:26], use="complete.obs"))
 # corrplot(M, method="circle")
 # http://www.sthda.com/english/wiki/visualize-correlation-matrix-using-correlogram
@@ -70,20 +78,199 @@ corrplot(cor(dustData_Reduced[1:26], use="complete.obs"))
 ```
 
 
+As we can see there are many variables that are highly correlated. The goal now is to find what variables we need and which we can throw out. We will break the variables into groups reflecting the output from the correlation graph.
 
-```{r Picking Our Variables, echo=FALSE, fig.cap= "Picking Our Variables", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+# Finding the Right Variables
+
+```{r Group 1, echo=FALSE, fig.cap= "Group 1", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+# Group 1:
+# BENZ_A_ANTHR, BENZ_B_FLUOR, BENZ_K_FLUOR, BENZ_A_PYRENE, CHRYSENE, DIBENZ_ANTHR, IDENO_PYR
+BENZ_A_ANTHR <- glm(CASESTAT ~ BENZ_A_ANTHR_1, data = train_DustData, family = "binomial")
+BENZ_B_FLUOR <- glm(CASESTAT ~ BENZ_B_FLUOR_1, data = train_DustData, family = "binomial")
+BENZ_K_FLUOR <- glm(CASESTAT ~ BENZ_K_FLUOR_1, data = train_DustData, family = "binomial")
+BENZ_A_PYRENE <- glm(CASESTAT ~ BENZ_A_PYRENE_1, data = train_DustData, family = "binomial")
+
+CHRYSENE <- glm(CASESTAT ~ CHRYSENE_1, data = train_DustData, family = "binomial")
+DIBENZ_ANTHR <- glm(CASESTAT ~ DIBENZ_ANTHR_1, data = train_DustData, family = "binomial")
+IDENO_PYR <- glm(CASESTAT ~ IDENO_PYR_1, data = train_DustData, family = "binomial")
+
+# -------------------------------------------
+cat("---------------------------------\n")
+summary(BENZ_A_ANTHR)
+cat("---------------------------------\n")
+summary(BENZ_B_FLUOR)
+cat("---------------------------------\n")
+summary(BENZ_K_FLUOR)
+cat("---------------------------------\n")
+summary(BENZ_A_PYRENE)
+cat("---------------------------------\n")
+
+
+summary(CHRYSENE)
+cat("---------------------------------\n")
+summary(DIBENZ_ANTHR)
+cat("---------------------------------\n")
+summary(IDENO_PYR)
+
+Group1_Chems <- c("BENZ_A_ANTHR", "BENZ_B_FLUOR", "BENZ_K_FLUOR", "BENZ_A_PYRENE", "CHRYSENE", "DIBENZ_ANTHR", "IDENO_PYR")
+# AIC <- c(extractAIC(BENZ_A_ANTHR), extractAIC(BENZ_B_FLUOR), extractAIC(BENZ_K_FLUOR), extractAIC(BENZ_A_PYRENE), extractAIC(CHRYSENE), 
+#          extractAIC(DIBENZ_ANTHR), extractAIC(IDENO_PYR))
+# cbind.data.frame(Group1_Chems, AIC)
+```
+
+Group 1 Winner: CHRYSENE  Estimate -0.07203, P-Value: 0.519, AIC: 1464.7
+
+
+```{r Group 2, echo=FALSE, fig.cap= "Group 2", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Group 2:
+# PCB105, PCB138, PCB153
+PCB105 <- glm(CASESTAT ~ PCB105_1, data = train_DustData, family = "binomial")
+PCB138 <- glm(CASESTAT ~ PCB138_1, data = train_DustData, family = "binomial")
+PCB153 <- glm(CASESTAT ~ PCB153_1, data = train_DustData, family = "binomial")
+
+# -------------------------------------------
+cat("---------------------------------\n")
+summary(PCB105)
+cat("---------------------------------\n")
+summary(PCB138)
+cat("---------------------------------\n")
+summary(PCB153)
+
+
+Group2_Chems <- c("PCB105", "PCB138", "PCB153")
+```
+
+Group 2 Winner: PCB105: Estimate: 0.1194, P-Value: 0.2650, AIC: 1463.8
+
+
+```{r Group 3, echo=FALSE, fig.cap= "Group 3", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Group 3:
+# PCB170, PCB180 <May need to look at other PCB's as well>
+PCB170 <- glm(CASESTAT ~ PCB170_1, data = train_DustData, family = "binomial")
+PCB180 <- glm(CASESTAT ~ PCB180_1, data = train_DustData, family = "binomial")
+
+# -------------------------------------------
+cat("---------------------------------\n")
+summary(PCB170)
+cat("---------------------------------\n")
+summary(PCB180)
+
+Group3_Chems <- c("PCB170", "PCB180")
+```
+
+Group 3 Winner: PCB180: Estimate: 0.18404, P-Value: 0.082, AIC: 1462
+
+
+```{r Group 4, echo=FALSE, fig.cap= "Group 4", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Group 4:
+# A_CHLORDANE, G_CHLORDANE
+
+A_CHLORDANE <- glm(CASESTAT ~ A_CHLORDANE_1, data = train_DustData, family = "binomial")
+G_CHLORDANE <- glm(CASESTAT ~ G_CHLORDANE_1, data = train_DustData, family = "binomial")
+
+# -------------------------------------------
+cat("---------------------------------\n")
+summary(A_CHLORDANE)
+cat("---------------------------------\n")
+summary(G_CHLORDANE)
+
+Group4_Chems <- c("A_CHLORDANE", "G_CHLORDANE")
+```
+
+Group 4 Winner: A_CHLORDANE: Estimate: 0.09623, P-Value: 0.253, AIC: 1463.8
+
+
+```{r Group 5, echo=FALSE, fig.cap= "Group 5", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Group 5:
+# DDE, DDT
+
+DDE <- glm(CASESTAT ~ DDE_1, data = train_DustData, family = "binomial")
+DDT <- glm(CASESTAT ~ DDT_1, data = train_DustData, family = "binomial")
+
+# -------------------------------------------
+cat("---------------------------------\n")
+summary(DDE)
+cat("---------------------------------\n")
+summary(DDT)
+
+Group5_Chems <- c("DDE", "DDT")
+```
+
+Group 5 Winner: DDE: Estimate: 0.21830, P-Value: 0.0661, AIC: 1461.7
+
+
+```{r Group 6, echo=FALSE, fig.cap= "Group 6", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+# Group 6:
+# CISPERMETHRIN, TRANSPERMETHRIN
+
+CISPERMETHRIN <- glm(CASESTAT ~ CISPERMETHRIN_1, data = train_DustData, family = "binomial")
+TRANSPERMETHRIN <- glm(CASESTAT ~ TRANSPERMETHRIN_1, data = train_DustData, family = "binomial")
+
+# -------------------------------------------
+cat("---------------------------------\n")
+summary(CISPERMETHRIN)
+cat("---------------------------------\n")
+summary(TRANSPERMETHRIN)
+
+Group6_Chems <- c("CISPERMETHRIN", "TRANSPERMETHRIN")
+
+
+```
+
+Group 6 Winner: TRANSPERMETHRIN: Estimate: -0.02564, P-Value: 0.618, AIC: 1464.8
+
+
+# Building Models
+
+## Stepwise Selection
+
+This model will be built using stepwise selection, using AIC as a criteria.
+
+```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 
 
+stepwiseModel1 <- glm(CASESTAT ~ ., data = na.omit(train_DustData[,c(1:27, 30)]), family = "binomial") %>% stepAIC(trace = FALSE)
+cat("---------------------------------\n")
+summary(stepwiseModel1)
+
+```
+
+
+## Using Hand Picked Variables
+
+Using the variables selected from before this is the current model
+
+```{r Building Model, echo=FALSE, fig.cap= "Building Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+model1 <- glm(CASESTAT ~ CHRYSENE_1 + PCB105_1 + PCB180_1 + A_CHLORDANE_1 + DDE_1 + TRANSPERMETHRIN_1, data = train_DustData, family = "binomial")
+cat("---------------------------------\n")
+summary(model1)
 
 ```
 
 
 
+## Comparing Models
 
 
+```{r Comparing Model, echo=FALSE, fig.cap= "Comparing Models", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+#TODO: K-Fold Validation still needed!!!
+
+roughPerformanceTest(test_DustData, "CASESTAT", stepwiseModel1)
 
 
+roughPerformanceTest(test_DustData, "CASESTAT", model1)
+
+```
 
 
 
