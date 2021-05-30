@@ -43,7 +43,7 @@ p_load(boot)
 
 # --------------------------------------
 # Read Data
-setwd("C:/Users/aknit/Documents/Grad School/Capstone")
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 dustData_Reduced = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=','))
 dustData_Reduced <- dustData_Reduced[-1]
 dustData_Reduced$CASESTAT <- as.factor(dustData_Reduced$CASESTAT)
