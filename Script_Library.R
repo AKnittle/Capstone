@@ -34,8 +34,26 @@ getSets <- function(dataset, propTraining = 0.9){
 # -------------------------------------------------------------
 # Cross Validation:
 
-cost.fn <- function(tol = 0.5, obs.response, fitted.probability) {
-  
+# cost.fn <- function(tol = 0.5, obs.response, fitted.probability) {
+#   
+#   t <- tibble(obs = obs.response, prob = fitted.probability.)
+#   # count number of false positives
+#   n.fp <- t %>%
+#     filter(obs == 0 & prob > tol) %>%
+#     nrow()
+#   # false negatives
+#   n.fn <- t %>%
+#     filter(obs == 1 & prob < tol) %>%
+#     nrow()
+#   return(error.rate <- (n.fp + n.fn)/nrow(t))
+# }
+
+
+
+
+# ---------------------------------------------------------------------
+cost.fn <- function(obs.response, fitted.probability.) {
+  tol=0.5
   t <- tibble(obs = obs.response, prob = fitted.probability.)
   # count number of false positives
   n.fp <- t %>%
@@ -47,9 +65,48 @@ cost.fn <- function(tol = 0.5, obs.response, fitted.probability) {
     nrow()
   return(error.rate <- (n.fp + n.fn)/nrow(t))
 }
+# ---------------------------------------------------------------------
+
+error.rater <- function(trainSet, model.fit, givenK=10) {
+  cv.glm(trainSet, glmfit = model.fit, cost = cost.fn, K = givenK)$delta[1]
+}
+# ---------------------------------------------------------------------
+
+# Confusion Matrix Builder that takes in Observed Values, Fitted Values, and Tolerance
+confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) {
+  t <- tibble(obs = obs.response, prob = fitted.probability)
+  # count number of false positives
+  n.fp <- t %>%
+    filter(obs == 0 & prob > passedTolerance) %>%
+    nrow()
+  # false negatives
+  n.fn <- t %>%
+    filter(obs == 1 & prob < passedTolerance) %>%
+    nrow()
+  # true positives
+  n.tp <- t %>%
+    filter(obs == 1 & prob > passedTolerance) %>%
+    nrow()
+  # true negatives
+  n.tn <- t %>%
+    filter(obs == 0 & prob < passedTolerance) %>%
+    nrow()
+  Observed.NO <- c(n.tn, n.fp) # True Negative, False Positive
+  Observed.YES <- c(n.fn, n.tp) # False Negative, True Positive
+  confusionDF <- data.frame(Observed.NO, Observed.YES, row.names = c("Predicted.NO", "Predicted.YES"))
+  
+  # error rate
+  Error.Rate <- (n.fp + n.fn)/nrow(t)
+  # false positive rate
+  False.Positive.Rate <- n.fp/(n.tn+n.fp)
+  # false negative rate
+  False.Negative.Rate <- n.fn/(n.fn+n.tp)
+  RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate)
+  return(list(confusionDF, RatesDF))
+}
 
 
-# TODO: Fix
+# Rough Performance Tester
 roughPerformanceTest <- function(testSet, dependentVar, givenModel){
   
   testSet <- na.omit(testSet)

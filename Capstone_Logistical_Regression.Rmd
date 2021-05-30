@@ -37,6 +37,9 @@ p_load(corrplot)
 p_load(tidyverse)
 p_load(caret)
 p_load(MASS)
+p_load(glm.predict)
+p_load(glmnet)
+p_load(boot)
 
 # --------------------------------------
 # Read Data
@@ -264,12 +267,25 @@ summary(model1)
 ```{r Comparing Model, echo=FALSE, fig.cap= "Comparing Models", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 #TODO: K-Fold Validation still needed!!!
+# Sensitivity, Specificity, PPV and PPD
+# Add in Blurb for each method
+
+
+
 
 roughPerformanceTest(test_DustData, "CASESTAT", stepwiseModel1)
 
 
 roughPerformanceTest(test_DustData, "CASESTAT", model1)
 
+
+# ----------------------------------------
+
+confusion.result <- confusionBuilder(na.omit(train_DustData[,c(1:27, 30)])$CASESTAT, stepwiseModel1$fitted.values, 0.5)
+confusion.result
+
+
+tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(train_DustData[,c(1:27, 30)]), stepwiseModel1, 10)))
 ```
 
 
