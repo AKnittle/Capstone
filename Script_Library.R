@@ -3,6 +3,7 @@
 
 
 # -------------------------------------------------------------
+# -------------------------------------------------------------
 # Build Test Set and Training Set:
 getSets <- function(dataset, propTraining = 0.9){
   # Set up some vars for getting what we need
@@ -32,23 +33,42 @@ getSets <- function(dataset, propTraining = 0.9){
 }
 
 # -------------------------------------------------------------
+# -------------------------------------------------------------
 # Cross Validation:
 
-# cost.fn <- function(tol = 0.5, obs.response, fitted.probability) {
-#   
-#   t <- tibble(obs = obs.response, prob = fitted.probability.)
-#   # count number of false positives
-#   n.fp <- t %>%
-#     filter(obs == 0 & prob > tol) %>%
-#     nrow()
-#   # false negatives
-#   n.fn <- t %>%
-#     filter(obs == 1 & prob < tol) %>%
-#     nrow()
-#   return(error.rate <- (n.fp + n.fn)/nrow(t))
-# }
-
-
+lda.k.fold.validator <- function(df, K) {
+  
+  # this function calculates the errors of a single fold using the fold as the holdout data
+  fold.errors <- function(df, holdout.indices) {
+    train.data <- df[-holdout.indices, ]
+    holdout.data <- df[holdout.indices, ]
+    fit <- lda(qual ~ ., data = train.data)
+    train.predict <- predict(fit) 
+    train.error <- mean(train.data$qual != train.predict$class)
+    holdout.predict <- predict(fit, newdata = holdout.data)
+    holdout.error <- mean(holdout.data$qual != holdout.predict$class)
+    tibble(train.error = train.error, valid.error = holdout.error)
+  }
+  
+  # shuffle the data and create the folds
+  indices <- sample(1:nrow(df))
+  # if argument K == 1 we want to do LOOCV
+  if (K == 1) {
+    K <- nrow(df)
+  }
+  folds <- cut(indices, breaks = K, labels = F)
+  # set error to 0 to begin accumulation of fold error rates
+  errors <- tibble()
+  # iterate on the number of folds
+  for (i in 1:K) {
+    holdout.indices <- which(folds == i, arr.ind = T)
+    folded.errors <- fold.errors(df, holdout.indices)
+    errors <- errors %>%
+      bind_rows(folded.errors)
+  }
+  errors %>%
+    summarize(train.error = mean(train.error), valid.error = mean(valid.error))
+}
 
 
 # ---------------------------------------------------------------------

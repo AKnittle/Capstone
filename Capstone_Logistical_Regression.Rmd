@@ -253,7 +253,7 @@ Using the variables selected from before this is the current model
 
 ```{r Building Model, echo=FALSE, fig.cap= "Building Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-model1 <- glm(CASESTAT ~ CHRYSENE_1 + PCB105_1 + PCB180_1 + A_CHLORDANE_1 + DDE_1 + TRANSPERMETHRIN_1, data = train_DustData, family = "binomial")
+model1 <- glm(CASESTAT ~ CHRYSENE_1 + PCB105_1 + PCB180_1 + A_CHLORDANE_1 + DDE_1 + TRANSPERMETHRIN_1, data = na.omit(train_DustData[,c(1:27, 30)]), family = "binomial")
 cat("---------------------------------\n")
 summary(model1)
 
@@ -261,34 +261,80 @@ summary(model1)
 
 
 
-## Comparing Models
+# Comparing Models
 
 
-```{r Comparing Model, echo=FALSE, fig.cap= "Comparing Models", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+## Handselected Model
 
-#TODO: K-Fold Validation still needed!!!
-# Sensitivity, Specificity, PPV and PPD
-# Add in Blurb for each method
-
+```{r Comparing Handselected Model Training, echo=FALSE, fig.cap= "Comparing Handselected Models Training", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 
 
-roughPerformanceTest(test_DustData, "CASESTAT", stepwiseModel1)
-
-
-roughPerformanceTest(test_DustData, "CASESTAT", model1)
+roughPerformanceTest(train_DustData, "CASESTAT", model1)
 
 
 # ----------------------------------------
 
-confusion.result <- confusionBuilder(na.omit(train_DustData[,c(1:27, 30)])$CASESTAT, stepwiseModel1$fitted.values, 0.5)
+confusion.result <- confusionBuilder(na.omit(train_DustData[,c(1:27, 30)])$CASESTAT, model1$fitted.values, 0.5)
 confusion.result
 
+
+tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(train_DustData[,c(1:27, 30)]), model1, 10)))
+```
+
+
+```{r Comparing Handselected Model Testing, echo=FALSE, fig.cap= "Comparing Handselected Models Testing", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+model1.test <- glm(formula = CASESTAT ~ CHRYSENE_1 + PCB105_1 + PCB180_1 + A_CHLORDANE_1 + 
+                     DDE_1 + TRANSPERMETHRIN_1, family = "binomial", data = na.omit(test_DustData[, c(1:27, 30)]))
+
+# ----------------------------------------
+
+roughPerformanceTest(test_DustData, "CASESTAT", model1.test)
+
+confusion.result <- confusionBuilder(na.omit(test_DustData[,c(1:27, 30)])$CASESTAT, model1.test$fitted.values, 0.5)
+confusion.result
+
+tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(test_DustData[,c(1:27, 30)]), model1.test, 10)))
+```
+
+
+## Stepwise Model
+
+
+```{r Comparing Stepwise Model Training, echo=FALSE, fig.cap= "Comparing Stepwise Models Training", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+# ----------------------------------------
+
+roughPerformanceTest(train_DustData, "CASESTAT", stepwiseModel1)
+
+confusion.result <- confusionBuilder(na.omit(train_DustData[,c(1:27, 30)])$CASESTAT, stepwiseModel1$fitted.values, 0.5)
+confusion.result
 
 tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(train_DustData[,c(1:27, 30)]), stepwiseModel1, 10)))
 ```
 
+```{r Comparing Stepwise Model Testing, echo=FALSE, fig.cap= "Comparing Stepwise Models Testing", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
+stepwiseModel1.test <- glm(formula = CASESTAT ~ D24_1 + BENZ_K_FLUOR_1 + BENZ_A_PYRENE_1 + CHRYSENE_1 + IDENO_PYR_1 + 
+                             PCB180_1 + DDE_1 + DDT_1 + DIAZINON_1 + METHOXYCHLOR_1, 
+                          family = "binomial", data = na.omit(test_DustData[, c(1:27, 30)]))
+
+# ----------------------------------------
+
+roughPerformanceTest(test_DustData, "CASESTAT", stepwiseModel1.test)
+
+confusion.result <- confusionBuilder(na.omit(test_DustData[,c(1:27, 30)])$CASESTAT, stepwiseModel1.test$fitted.values, 0.5)
+confusion.result
+
+tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(test_DustData[,c(1:27, 30)]), stepwiseModel1.test, 10)))
+```
+
+# Conclusion
+
+The Stepwise Model performed best.
+
+## Reflection
 
 
 
