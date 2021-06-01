@@ -77,6 +77,15 @@ lda.fit <- lda(lda.formula, data = train_DustData)
 lda.fit
 lda.k.fold.validator(train_DustData, "CASESTAT", 10)
 lda.k.fold.validator(test_DustData, "CASESTAT", 10)
+test.predValues <-as.numeric(as.character(predict(lda.fit, test_DustData)$class))
+
+confusionBuilder(test_DustData$CASESTAT, test.predValues, 0.5)
+
 ```
 
 
+# Conclusion
+
+TODO
+
+## About

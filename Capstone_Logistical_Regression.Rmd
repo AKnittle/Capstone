@@ -1,5 +1,5 @@
 ---
-title: "Capstone: Exploratory Analysis"
+title: "Capstone: Logistical Regression"
 author: "Andrew Knittle"
 date: "`r paste('Generated on', Sys.Date())`" 
 output: 
@@ -334,7 +334,7 @@ tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(test_DustDa
 
 The Stepwise Model performed best.
 
-## Reflection
+## About
 
 
 
