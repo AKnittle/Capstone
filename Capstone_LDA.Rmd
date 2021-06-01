@@ -1,5 +1,5 @@
 ---
-title: "Capstone: Exploratory Analysis"
+title: "Capstone: LDA"
 author: "Andrew Knittle"
 date: "`r paste('Generated on', Sys.Date())`" 
 output: 
@@ -52,9 +52,11 @@ logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
-train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
+train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
+train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
 test_DustData <-  as.data.frame(read.csv('Data/Testing Set_0.1_May 25 2021.csv',header=T,sep=','))[-1]
-test_DustData$CASESTAT <- as.factor(test_DustData$CASESTAT)
+test_DustData$CASESTAT <- as.numeric(test_DustData$CASESTAT)
+test_DustData <- na.omit(test_DustData[,c(1:27, 30)])
 
 # --------------------------------------
 # Read helper script
@@ -70,11 +72,11 @@ source("Script_Library.R")
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-lda.formula <- formula(qual ~ .)
-lda.fit <- lda(lda.formula, train.wines)
+lda.formula <- formula(CASESTAT ~ .)
+lda.fit <- lda(lda.formula, data = train_DustData)
 lda.fit
-
-
+lda.k.fold.validator(train_DustData, "CASESTAT", 10)
+lda.k.fold.validator(test_DustData, "CASESTAT", 10)
 ```
 
 

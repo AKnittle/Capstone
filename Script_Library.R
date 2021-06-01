@@ -36,20 +36,21 @@ getSets <- function(dataset, propTraining = 0.9){
 # -------------------------------------------------------------
 # Cross Validation:
 
-lda.k.fold.validator <- function(df, K) {
+# ---------------------------------------------------------------------
+lda.k.fold.validator <- function(df, dependentVar, K) {
   
   # this function calculates the errors of a single fold using the fold as the holdout data
   fold.errors <- function(df, holdout.indices) {
+    formulaGiven <- as.formula(paste(dependentVar, "~ ."))
     train.data <- df[-holdout.indices, ]
     holdout.data <- df[holdout.indices, ]
-    fit <- lda(qual ~ ., data = train.data)
+    fit <- lda(formulaGiven, data = train.data)
     train.predict <- predict(fit) 
-    train.error <- mean(train.data$qual != train.predict$class)
+    train.error <- mean(train.data[,dependentVar] != train.predict$class)
     holdout.predict <- predict(fit, newdata = holdout.data)
-    holdout.error <- mean(holdout.data$qual != holdout.predict$class)
-    tibble(train.error = train.error, valid.error = holdout.error)
+    holdout.error <- mean(holdout.data[,dependentVar] != holdout.predict$class)
+    return(tibble(train.error = train.error, valid.error = holdout.error))
   }
-  
   # shuffle the data and create the folds
   indices <- sample(1:nrow(df))
   # if argument K == 1 we want to do LOOCV
@@ -63,8 +64,7 @@ lda.k.fold.validator <- function(df, K) {
   for (i in 1:K) {
     holdout.indices <- which(folds == i, arr.ind = T)
     folded.errors <- fold.errors(df, holdout.indices)
-    errors <- errors %>%
-      bind_rows(folded.errors)
+    errors <- bind_rows(errors, folded.errors)
   }
   errors %>%
     summarize(train.error = mean(train.error), valid.error = mean(valid.error))
