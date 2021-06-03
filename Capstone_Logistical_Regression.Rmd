@@ -327,14 +327,43 @@ roughPerformanceTest(test_DustData, "CASESTAT", stepwiseModel1.test)
 confusion.result <- confusionBuilder(na.omit(test_DustData[,c(1:27, 30)])$CASESTAT, stepwiseModel1.test$fitted.values, 0.5)
 confusion.result
 
-tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(test_DustData[,c(1:27, 30)]), stepwiseModel1.test, 10)))
+errorRateTable <- tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(test_DustData[,c(1:27, 30)]), stepwiseModel1.test, 10)))
+errorRateTable
 ```
 
 # Conclusion
 
-The Stepwise Model performed best.
+The Stepwise Model performed best compare to "By Hand" model in terms of error rate for the test set using 10-Fold Cross Validation.
 
-## About
+```{r Final Model, echo=FALSE, fig.cap= "Final Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+
+summary(stepwiseModel1.test)
+
+# ----------------------------------------
+
+
+confusion.result
+errorRateTable
+```
+
+CASESTAT ~ 1.4191 + (0.1780)D24 + (0.5941)BENZ_K_FLUOR + (-3.3352)BENZ_A_PYRENE + (-2.9114)CHRYSENE + 
+           (5.2359)IDENO_PYR + (-0.1204)PCB180 + (0.9109)DDE + (-0.2635)DDT + (-0.1117)DIAZINON + (-0.1794)METHOXYCHLOR
+
+We see that only 3 variables are statistically significant when using data from the testset; BENZ_A_PYRENE, CHRYSENE, and IDENO_PYR. Curiously only one of the chemicals has a positive coefficient estimate in log odds.
+
+## Method
+
+Logistic Regression was chosen because of the binary dependent variable and the simplicity of implementing it. Logistic Regression gives us the probability that someone will likely contract cancer when introduced to the chemicals in the model, and based on that probability we can classify a person developing cancer or not.
+
+Each coefficient represents the log odds of one unit of chemicals making a subject have cancer. So for example from the model that was produced earlier the log odds of developing cancer increases by 5.23 for every one unit of IDENO_PYR.
+
+
+
+
+
+
+
 
 
 

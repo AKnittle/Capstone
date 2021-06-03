@@ -75,8 +75,9 @@ source("Script_Library.R")
 lda.formula <- formula(CASESTAT ~ .)
 lda.fit <- lda(lda.formula, data = train_DustData)
 lda.fit
-lda.k.fold.validator(train_DustData, "CASESTAT", 10)
-lda.k.fold.validator(test_DustData, "CASESTAT", 10)
+lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
+errorRateTable.test <- lda.k.fold.validator2(test_DustData, "CASESTAT", 10)
+errorRateTable.test
 test.predValues <-as.numeric(as.character(predict(lda.fit, test_DustData)$class))
 
 confusionBuilder(test_DustData$CASESTAT, test.predValues, 0.5)
@@ -86,6 +87,42 @@ confusionBuilder(test_DustData$CASESTAT, test.predValues, 0.5)
 
 # Conclusion
 
-TODO
+```{r Final Model, echo=FALSE, fig.cap= "Final Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-## About
+
+lda.fit
+
+# ----------------------------------------
+errorRateTable.test
+confusionBuilder(test_DustData$CASESTAT, test.predValues, 0.5)
+```
+
+## Method
+
+Linear Discriminatory Analysis (LDA) focuses on maximizing the separability among known categories, in this case it's positive and negative cancer results. This is done via a "cut", or plain, to create the separation. It functions similarly to Principle Component Analysis (PCA).
+
+An important feature about LDA is that it only works on continuous independent variables, so this is perfect for the amount of chemicals detected as they are numerical continuous features. These variables are used to find the best linear combination of them to help best distinguish data across two or more groups. However, LDA is normally used when working with more than 2 classes, or factors.
+
+The output from the model produced here contains all of the dependent variables in the dataset and their coefficients are listed above. This will be of interest later as we explore LASSO, and it's very similar partner Ridge, as both take in all the variables available to them and takes the least worst performing variables' coefficients and making them *practically* zero.
+
+Some variables that stand out are *BENZ_K_FLUOR, BENZ_A_PYRENE, CHRYSENE, IDENO_PYR*, and *DDE* as they are the only dependent variables in the model with coefficients that are greater than 1 in absolute value. Most of the other variables do not have coefficients that are several decimal points behind the ones digit. Also what is interesting is that from previous work using a logistical model we saw that *BENZ_A_PYRENE, CHRYSENE*, and *IDENO_PYR* were the only significant dependent variables when used on the testset. While the coefficients between this model and the logistical model mean completely different things I have a hunch that these 3 variables will prove to be of great interest over the course of this project.
+
+### Interesting Notes of Certain Chemicals
+
+*Indeno Pyrene* is ["primarily found in certain foods, gasoline and diesel exhaust, cigarette smoke, coal tar and coal tar pitch, soot and petroleum asphalt."](https://pubchem.ncbi.nlm.nih.gov/compound/Indeno_1_2_3-cd_pyrene#:~:text=Indeno%5B1%2C2%2C3%2Dcd%5Dpyrene%20is,pitch%2C%20soot%20and%20petroleum%20asphalt.)
+
+*CHRYSENE* ["is an ortho-fused polycyclic arene found commonly in the coal tar. It has a role as a plant metabolite."](https://pubchem.ncbi.nlm.nih.gov/compound/Chrysene)
+
+*BENZ_A_PYRENE* ["is an ortho- and peri-fused polycyclic arene consisting of five fused benzene rings. It has a role as a carcinogenic agent and a mouse metabolite. This substance is used only for research purposes. 3,4-Benzpyrene is reasonably anticipated to be a human carcinogen." ](https://pubchem.ncbi.nlm.nih.gov/compound/Benzo_a_pyrene)
+
+
+<REVIST THIS>
+I believe the output here can be improved:
+  * Only use Gaussian Vars
+  * Use Better Cross Validation (See Homework2C.Rmd in Data Analytics)
+  * Revisit interesting Chems
+
+
+
+
+
