@@ -82,6 +82,14 @@ if(!file.exists("lassoResult.rds")){
 }
 
 coef(lassoResult$lasso.mod, s=lassoResult$bestLambda)
+predicted.classes <- ifelse(lassoResult$pred.lasso > 0.5, 0, 1)
+
+mean(predicted.classes == train_DustData$CASESTAT)
+
+# Plot cross validation for lambda
+plot(lassoResult$cv.out)
+
+plot(lassoResult$lasso.mod, xvar = "lambda")
 
 ```
 

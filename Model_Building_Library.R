@@ -16,7 +16,7 @@ buildLasso <- function(dataset, dependentVar, lamVals, binaryResp=TRUE){
   
   # Build a model matrix of the model
   x <- model.matrix(as.formula(paste(dependentVar, "~ .")), dataset)[,-1]
-  y <- dataset[[dependentVar]]
+  y <- as.factor(dataset[[dependentVar]])
   
   # glmnet fits lasso regression for each value of lambda provided
   # note: if alpha=0, the glmnet fits ridge regression; alpha=1 fits lasso
@@ -55,6 +55,14 @@ buildLasso <- function(dataset, dependentVar, lamVals, binaryResp=TRUE){
 # tempResult <- buildLasso(train_DustData, "CASESTAT", lambda)
 # tempResult$bestLambda
 # coef(tempResult$lasso.mod,s=tempResult$bestLambda)
+# predicted.classes <- ifelse(tempResult$pred.lasso > 0.5, 0, 1)
+# mean(predicted.classes == train_DustData$CASESTAT)
+# plot(tempResult$lasso.mod, xvar = "lambda")
+
+
+
+
+
 
 
 
