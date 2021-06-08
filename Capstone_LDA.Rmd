@@ -72,15 +72,15 @@ source("Script_Library.R")
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-lda.formula <- formula(CASESTAT ~ .)
+lda.formula <- formula(CASESTAT ~ DDE_1)
 lda.fit <- lda(lda.formula, data = train_DustData)
 lda.fit
 lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
-errorRateTable.test <- lda.k.fold.validator2(test_DustData, "CASESTAT", 10)
+errorRateTable.test <- lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
 errorRateTable.test
-test.predValues <-as.numeric(as.character(predict(lda.fit, test_DustData)$class))
+test.predValues <-as.numeric(as.character(predict(lda.fit, train_DustData)$class))
 
-confusionBuilder(test_DustData$CASESTAT, test.predValues, 0.5)
+confusionBuilder(train_DustData$CASESTAT, test.predValues, 0.5)
 
 ```
 
@@ -114,6 +114,8 @@ Some variables that stand out are *BENZ_K_FLUOR, BENZ_A_PYRENE, CHRYSENE, IDENO_
 *CHRYSENE* ["is an ortho-fused polycyclic arene found commonly in the coal tar. It has a role as a plant metabolite."](https://pubchem.ncbi.nlm.nih.gov/compound/Chrysene)
 
 *BENZ_A_PYRENE* ["is an ortho- and peri-fused polycyclic arene consisting of five fused benzene rings. It has a role as a carcinogenic agent and a mouse metabolite. This substance is used only for research purposes. 3,4-Benzpyrene is reasonably anticipated to be a human carcinogen." ](https://pubchem.ncbi.nlm.nih.gov/compound/Benzo_a_pyrene)
+
+From the Mayo Clinic: ["Chemicals. Certain chemicals, such as those used to kill insects and weeds, may increase your risk of developing non-Hodgkin's lymphoma. More research is needed to understand the possible link between pesticides and the development of non-Hodgkin's lymphoma."](https://www.mayoclinic.org/diseases-conditions/non-hodgkins-lymphoma/symptoms-causes/syc-20375680)
 
 
 <REVIST THIS>

@@ -312,6 +312,7 @@ confusion.result <- confusionBuilder(na.omit(train_DustData[,c(1:27, 30)])$CASES
 confusion.result
 
 tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(train_DustData[,c(1:27, 30)]), stepwiseModel1, 10)))
+# TODO: Out of curiosity throw everything into a logistic model
 ```
 
 ```{r Comparing Stepwise Model Testing, echo=FALSE, fig.cap= "Comparing Stepwise Models Testing", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
