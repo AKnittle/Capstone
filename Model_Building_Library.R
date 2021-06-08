@@ -23,7 +23,7 @@ buildLasso <- function(dataset, dependentVar, lamVals, binaryResp=TRUE){
   # note: glmnet will standardize each column of x so that it ranges between 0 and 1
   # note: glmnet requires x and y, not a formula
   lasso.mod=glmnet(x,y,alpha=1,lambda=lamVals, family="binomial", thresh = 1e-12)
-  cv.out=cv.glmnet(x,y,alpha=1,lambda=lamVals, family="binomial", thresh = 1e-12)
+  cv.out=cv.glmnet(x,y,alpha=1, family="binomial", thresh = 1e-12)
   # This is the best lambda value found
   bestLambda=cv.out$lambda.min
   print(bestLambda)
