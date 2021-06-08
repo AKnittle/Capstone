@@ -66,8 +66,20 @@ source("Model_Building_Library.R")
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-lambda <- 10^seq(10,-2,length=30)
-lassoResult <- buildLasso(train_DustData, "CASESTAT", lambda)
+# Initialize Lasso Results from method
+lassoResult <- NA
+
+# Do to randomness beyond my control, and even having the seed set throughout
+# I've saved the result of building a Lasso Model with results that make sense.
+# If however the file for it does not exist build it again, but no you may need
+# repeat the process several times until you get satisfying results
+if(!file.exists("lassoResult.rds")){
+  lambda <- 10^seq(10,-2,length=30)
+  lassoResult <- buildLasso(train_DustData, "CASESTAT", lambda)
+  
+}else{
+  lassoResult <- readRDS(file = "lassoResult.rds")
+}
 
 coef(lassoResult$lasso.mod, s=lassoResult$bestLambda)
 

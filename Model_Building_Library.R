@@ -2,6 +2,8 @@
 
 # -------------------------------------------------------------
 # Lasso -------------------------------------------------------
+# http://www.sthda.com/english/articles/36-classification-methods-essentials/149-penalized-logistic-regression-essentials-in-r-ridge-lasso-and-elastic-net/
+# -------------------------------------------------------------
 
 
 # Build a model using Lasso Regression.
@@ -49,11 +51,9 @@ buildLasso <- function(dataset, dependentVar, lamVals, binaryResp=TRUE){
 }
 
 # Test Lasso Builder
-lambda <- 10^seq(10,-2,length=30)
-tempResult <- buildLasso(train_DustData, "CASESTAT", lambda)
-
-tempResult$bestLambda
-
+# lambda <- 10^seq(10,-2,length=30)
+# tempResult <- buildLasso(train_DustData, "CASESTAT", lambda)
+# tempResult$bestLambda
 # coef(tempResult$lasso.mod,s=tempResult$bestLambda)
 
 
