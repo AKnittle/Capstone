@@ -1,0 +1,122 @@
+---
+title: "Capstone: Conditional Decision Trees"
+author: "Andrew Knittle"
+date: "`r paste('Generated on', Sys.Date())`" 
+output: 
+  html_document: 
+    # try readable or cosmo
+    # default (default), try kable, tibble, or paged as an option
+    # Options are none (default), show, and hide
+    # default is null, try my_style_file.css
+    toc: TRUE
+    toc_depth: 3
+    toc_float: FALSE
+    highlight: haddock
+    theme: flatly
+    df_print: paged
+    code_folding: none
+    self_contained: TRUE
+---
+
+```{r setup, include=FALSE}
+# --------------------------------------
+# Clean and Prep Environment
+rm(list=ls())
+set.seed(123)
+
+# --------------------------------------
+# Load Libraries
+library(pacman)
+p_load(ggplot2)
+p_load(ISLR)
+p_load(dplyr)
+p_load(psych)
+p_load(ggpubr)
+p_load(kableExtra)
+p_load(corrplot)
+p_load(tidyverse)
+p_load(caret)
+p_load(MASS)
+p_load(glm.predict)
+p_load(glmnet)
+p_load(leaps)
+
+# --------------------------------------
+# Read Data
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
+logDustData <- logDustData[-1]
+logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
+
+train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
+train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
+train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
+# --------------------------------------
+# Read helper script
+source("Exploratory_Support_Scripts.R")
+source("Script_Library.R")
+source("Model_Building_Library.R")
+
+
+
+```
+
+
+# How do Conditional Decision Trees Work
+
+**NOTE:** This explanation will assume that the reader has a working understanding of how tree data structures work.
+
+Decision trees work similarly to binary search trees; each node determines how to travel the tree based on data being processed through it. The data can be binary, categorical, or numeric. Each node in the tree is chosen by what node has the lowest impurity (Most common usage is *Gini*). The root node is determined this way, and child nodes are chosen the same way recursively.
+
+Left nodes/leaves are considered *True*, and Right nodes/leaves are considered *True*.
+
+## Steps to build a Tree
+
+### 1.
+
+Build a root node. Go through all the variables (temporary root nodes) used to predict an outcome, and then build leaf nodes for each outcome and what that variable's value was (Similar to a confusion matrix). You then go through each temporary root node.
+
+### 2.
+
+Now with all the candidate root nodes, with their corresponding leaf nodes, are made we need to calculate their "*Impurity*"; typically using *Gini*. Each Leaf node's impurity is calculated as:
+$$
+Impurity = 1 - P(Yes)^2 - P(No)^2
+$$
+**Remember:** The *Left leaf node* is when the **Dependent Variable is TRUE**, and The *Right leaf node* is when the **Dependent Variable is FALSE**. 
+The "Yes" and "No" in the formula above is for the hypothetical Independent Variable and the values it had with the Dependent Variable when it was found to be True or False.
+
+
+Now that both leaf nodes have their impurity calculated we use them for calculated the overall impurity of the Independent Variable of separating the Dependent Variable. The overall impurity for the current internal node is the weighted average of the leaf node impurities.
+
+It's important to note that the leaf nodes are likely impure; each has a mixture of true and false values of the dependent variable.
+
+$$
+Impurity_{Overall} = (\frac{(Pop_{Left})}{(Pop_{Left} + Pop_{Right})}*Impurity_{Left}) + (\frac{(Pop_{Right})}{(Pop_{Left} + Pop_{Right})}*Impurity_{Right})
+$$
+### 3.
+
+After Calculating the Overall Impurity for each Independent Variable we pick the one with the lowest Impurity to be the root of the tree.
+
+### 4.
+
+Once we pick the root node we still have to use the other Independent Variables. Starting on the leaf node on the left, we see how well the Population used for that node does for the other Independent Variables. We do the same thing we did before and try to find the Gini Impurity value of each remaining Independent Variable (this is where things start to become recursive).
+
+Once we have the best Independent Variable in terms of the root's left leaf node, now the newest internal node we rinse and repeat until we exhaust all sides of the tree and/or variables that have good impurity values.
+
+Now if a leaf node has a better impurity score than when trying to replace it with an independent variable then we leave it as is. We check the impurity score of the current leaf node, compare it to the candidate variable(s) and if none perform better then that's it.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
