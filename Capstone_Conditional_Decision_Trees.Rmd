@@ -33,13 +33,13 @@ p_load(dplyr)
 p_load(psych)
 p_load(ggpubr)
 p_load(kableExtra)
-p_load(corrplot)
 p_load(tidyverse)
 p_load(caret)
 p_load(MASS)
 p_load(glm.predict)
 p_load(glmnet)
 p_load(leaps)
+p_load(partykit)
 
 # --------------------------------------
 # Read Data
@@ -49,7 +49,8 @@ logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
-train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
+#train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
+train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
 train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
 # --------------------------------------
 # Read helper script
@@ -106,10 +107,51 @@ Once we have the best Independent Variable in terms of the root's left leaf node
 Now if a leaf node has a better impurity score than when trying to replace it with an independent variable then we leave it as is. We check the impurity score of the current leaf node, compare it to the candidate variable(s) and if none perform better then that's it.
 
 
+# Building the Model
 
 
+```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+# Build Model
+treeModel <- buildCDTree(train_DustData,"CASESTAT")
+
+# Print Model
+print(treeModel)
+plot(treeModel)
 
 
+Alpha <- sample(1:100, size = 1062, replace = TRUE)
+Beta <- sample(c(0,1), size = 1062, replace = TRUE)
+Delta <- sample(Beta, size = 1062, replace = TRUE)
+Epsilon <- c(rep.int(0,531), rep.int(1,531))
+Gamma <- 1:1062
+Zeta <- sin(Gamma)
+Mu <- Gamma*10
+Sigma <- rep(1:6, times=177)
+Phi <- abs(Zeta)
+Xi <- as.numeric(Zeta > 0)
+
+dummyData <- cbind.data.frame(Alpha, Beta, Delta, Epsilon, Gamma, Zeta, Mu, Sigma, Phi, Xi)
+
+dummyData$Beta <- as.factor(dummyData$Beta)
+dummyData$Delta <- as.factor(dummyData$Delta)
+dummyData$Epsilon <- as.factor(dummyData$Epsilon)
+dummyData$Sigma <- as.factor(dummyData$Sigma)
+dummyData$Xi <- as.factor(dummyData$Xi)
+
+
+# testTree <- ctree(CASESTAT ~ D24_1 + DICAMBA_1 + BENZ_A_PYRENE_1 + PCB180_1 + CHLORPYRIFOS_1 + DDE_1 +
+#                     DDT_1 + DIAZINON_1 + METHOXYCHLOR_1 + PENTACHLOROPHENOL_1, train_DustData)
+
+# testTree2 <- ctree(CASESTAT ~ Alpha + Beta + DDE_1, data = dummyData)
+# print(testTree2)
+# plot(testTree2)
+
+testTree3 <- ctree(Xi ~ ., data = dummyData)
+print(testTree3)
+plot(testTree3)
+
+```
 
 
 

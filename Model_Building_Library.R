@@ -67,7 +67,15 @@ buildLasso <- function(dataset, dependentVar, lamVals, binaryResp=TRUE){
 # https://www.youtube.com/watch?v=7VeUPuFGJHk&ab_channel=StatQuestwithJoshStarmer
 # -------------------------------------------------------------
 
+# Build a Conditional Decision Tree model
+# Mostly a wrapper for ctree of the partykit library
+#   dataset = data passed in
+#   dependentVar = value we want to predict
 
+buildCDTree <- function(dataset, dependentVar) {
+  treeModel <- ctree(as.formula(paste(dependentVar, "~ .")), data = dataset)
+  return(treeModel)
+}
 
 
 

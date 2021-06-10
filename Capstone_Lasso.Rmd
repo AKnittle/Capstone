@@ -35,6 +35,7 @@ p_load(ggpubr)
 p_load(kableExtra)
 p_load(corrplot)
 p_load(tidyverse)
+p_load(tidyr)
 p_load(caret)
 p_load(MASS)
 p_load(glm.predict)
@@ -44,6 +45,12 @@ p_load(leaps)
 # --------------------------------------
 # Read Data
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
+dustData = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=',')) # OG dataset
+dustData <- dustData[-1]
+dustData$CASESTAT <- as.factor(dustData$CASESTAT)
+dustData <- na.omit(dustData[,c(1:27, 30)])
+
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
@@ -51,6 +58,12 @@ logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
 train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
 train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
+
+
+train_DustData.long <- gather(train_DustData, Chemical, Amount, 1:27, factor_key = TRUE)
+dustData.long <- gather(dustData, Chemical, Amount, 1:27, factor_key = TRUE)
+
+
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
@@ -61,7 +74,69 @@ source("Model_Building_Library.R")
 
 ```
 
+```{r Interesting Plots, echo=FALSE, fig.cap= "Interesting Plots", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
+
+untouchedPlot <- ggplot(dustData.long) +
+  aes(
+    x = Chemical,
+    y = Amount,
+    fill = Chemical,
+    colour = Chemical
+  ) +
+  geom_boxplot(shape = "circle") +
+  scale_fill_hue(direction = 1) +
+  scale_color_hue(direction = 1) +
+  theme_minimal() +
+  facet_wrap(vars(CASESTAT))
+
+log2OGPlot <- ggplot(dustData.long) +
+  aes(
+    x = Chemical,
+    y = Amount,
+    fill = Chemical,
+    colour = Chemical
+  ) +
+  geom_boxplot(shape = "circle") +
+  scale_fill_hue(direction = 1) +
+  scale_color_hue(direction = 1) +
+  scale_y_continuous(trans = "log2") +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  facet_wrap(vars(CASESTAT))
+
+log2OGPlot.byChem <- ggplot(dustData.long) +
+  aes(
+    x = CASESTAT,
+    y = Amount,
+    fill = CASESTAT,
+    colour = CASESTAT
+  ) +
+  geom_boxplot(shape = "circle") +
+  scale_fill_hue(direction = 1) +
+  scale_color_hue(direction = 1) +
+  scale_y_continuous(trans = "log2") +
+  theme_minimal() +
+  facet_wrap(vars(Chemical))
+
+
+log10TrainPlot <- ggplot(train_DustData.long) +
+  aes(
+    x = Chemical,
+    y = Amount,
+    fill = Chemical,
+    colour = Chemical
+  ) +
+  geom_boxplot(shape = "circle") +
+  scale_fill_hue(direction = 1) +
+  scale_color_hue(direction = 1) +
+  scale_y_continuous(trans = "log10") + # Note the transform
+  theme_minimal() +
+  facet_wrap(vars(CASESTAT))
+
+
+
+```
 
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
