@@ -144,7 +144,7 @@ log10TrainPlot <- ggplot(train_DustData.long) +
 # Initialize Lasso Results from method
 lassoResult <- NA
 
-# Do to randomness beyond my control, and even having the seed set throughout
+# Due to randomness beyond my control, and even having the seed set throughout
 # I've saved the result of building a Lasso Model with results that make sense.
 # If however the file for it does not exist build it again, but no you may need
 # repeat the process several times until you get satisfying results

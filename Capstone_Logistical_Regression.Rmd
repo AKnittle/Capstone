@@ -40,21 +40,25 @@ p_load(MASS)
 p_load(glm.predict)
 p_load(glmnet)
 p_load(boot)
+p_load(pROC)
 
 # --------------------------------------
 # Read Data
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-dustData_Reduced = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=','))
-dustData_Reduced <- dustData_Reduced[-1]
-dustData_Reduced$CASESTAT <- as.factor(dustData_Reduced$CASESTAT)
+
+dustData = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=',')) # OG dataset
+dustData <- dustData[-1]
+dustData$CASESTAT <- as.factor(dustData$CASESTAT)
+dustData <- na.omit(dustData[,c(1:27, 30)])
+
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
+#train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
 train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
-test_DustData <-  as.data.frame(read.csv('Data/Testing Set_0.1_May 25 2021.csv',header=T,sep=','))[-1]
-test_DustData$CASESTAT <- as.factor(test_DustData$CASESTAT)
+train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
 
 # --------------------------------------
 # Read helper script
@@ -73,7 +77,7 @@ source("Script_Library.R")
 # Correlation matrix
 # Probably looking at one of the Benz ones
 #cor(dustData_Reduced[1:26], use="complete.obs")
-corrplot(cor(dustData_Reduced[1:26], use="complete.obs"))
+corrplot(cor(dustData[1:26], use="complete.obs"))
 # corrplot(M, method="circle")
 # http://www.sthda.com/english/wiki/visualize-correlation-matrix-using-correlogram
 
@@ -240,7 +244,7 @@ This model will be built using stepwise selection, using AIC as a criteria.
 
 
 
-stepwiseModel1 <- glm(CASESTAT ~ ., data = na.omit(train_DustData[,c(1:27, 30)]), family = "binomial") %>% stepAIC(trace = FALSE)
+stepwiseModel1 <- glm(CASESTAT ~ ., data = train_DustData, family = "binomial") %>% stepAIC(trace = FALSE)
 cat("---------------------------------\n")
 summary(stepwiseModel1)
 
@@ -253,7 +257,7 @@ Using the variables selected from before this is the current model
 
 ```{r Building Model, echo=FALSE, fig.cap= "Building Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-model1 <- glm(CASESTAT ~ CHRYSENE_1 + PCB105_1 + PCB180_1 + A_CHLORDANE_1 + DDE_1 + TRANSPERMETHRIN_1, data = na.omit(train_DustData[,c(1:27, 30)]), family = "binomial")
+model1 <- glm(CASESTAT ~ CHRYSENE_1 + PCB105_1 + PCB180_1 + A_CHLORDANE_1 + DDE_1 + TRANSPERMETHRIN_1, data = train_DustData, family = "binomial")
 cat("---------------------------------\n")
 summary(model1)
 
@@ -275,27 +279,11 @@ roughPerformanceTest(train_DustData, "CASESTAT", model1)
 
 # ----------------------------------------
 
-confusion.result <- confusionBuilder(na.omit(train_DustData[,c(1:27, 30)])$CASESTAT, model1$fitted.values, 0.5)
+confusion.result <- confusionBuilder(train_DustData$CASESTAT, model1$fitted.values, 0.5)
 confusion.result
 
 
-tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(train_DustData[,c(1:27, 30)]), model1, 10)))
-```
-
-
-```{r Comparing Handselected Model Testing, echo=FALSE, fig.cap= "Comparing Handselected Models Testing", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
-
-model1.test <- glm(formula = CASESTAT ~ CHRYSENE_1 + PCB105_1 + PCB180_1 + A_CHLORDANE_1 + 
-                     DDE_1 + TRANSPERMETHRIN_1, family = "binomial", data = na.omit(test_DustData[, c(1:27, 30)]))
-
-# ----------------------------------------
-
-roughPerformanceTest(test_DustData, "CASESTAT", model1.test)
-
-confusion.result <- confusionBuilder(na.omit(test_DustData[,c(1:27, 30)])$CASESTAT, model1.test$fitted.values, 0.5)
-confusion.result
-
-tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(test_DustData[,c(1:27, 30)]), model1.test, 10)))
+tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(train_DustData, model1, 10)))
 ```
 
 
@@ -308,29 +296,14 @@ tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(test_DustDa
 
 roughPerformanceTest(train_DustData, "CASESTAT", stepwiseModel1)
 
-confusion.result <- confusionBuilder(na.omit(train_DustData[,c(1:27, 30)])$CASESTAT, stepwiseModel1$fitted.values, 0.5)
+confusion.result <- confusionBuilder(train_DustData$CASESTAT, stepwiseModel1$fitted.values, 0.5)
 confusion.result
 
-tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(train_DustData[,c(1:27, 30)]), stepwiseModel1, 10)))
+tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(train_DustData, stepwiseModel1, 10)))
 # TODO: Out of curiosity throw everything into a logistic model
 ```
 
-```{r Comparing Stepwise Model Testing, echo=FALSE, fig.cap= "Comparing Stepwise Models Testing", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-stepwiseModel1.test <- glm(formula = CASESTAT ~ D24_1 + BENZ_K_FLUOR_1 + BENZ_A_PYRENE_1 + CHRYSENE_1 + IDENO_PYR_1 + 
-                             PCB180_1 + DDE_1 + DDT_1 + DIAZINON_1 + METHOXYCHLOR_1, 
-                          family = "binomial", data = na.omit(test_DustData[, c(1:27, 30)]))
-
-# ----------------------------------------
-
-roughPerformanceTest(test_DustData, "CASESTAT", stepwiseModel1.test)
-
-confusion.result <- confusionBuilder(na.omit(test_DustData[,c(1:27, 30)])$CASESTAT, stepwiseModel1.test$fitted.values, 0.5)
-confusion.result
-
-errorRateTable <- tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(na.omit(test_DustData[,c(1:27, 30)]), stepwiseModel1.test, 10)))
-errorRateTable
-```
 
 # Conclusion
 

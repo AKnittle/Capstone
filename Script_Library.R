@@ -178,11 +178,18 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
   
   # error rate
   Error.Rate <- (n.fp + n.fn)/nrow(t)
+  
   # false positive rate
   False.Positive.Rate <- n.fp/(n.tn+n.fp)
   # false negative rate
   False.Negative.Rate <- n.fn/(n.fn+n.tp)
-  RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate)
+  
+  # true positive rate
+  True.Positive.Rate <- n.tp/(n.tp+n.fn)
+  # true positive rate
+  True.Negative.Rate <- n.tn/(n.tn+n.fp)
+  
+  RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, True.Positive.Rate, True.Negative.Rate)
   return(list(confusionDF, RatesDF))
 }
 
@@ -203,6 +210,75 @@ roughPerformanceTest <- function(testSet, dependentVar, givenModel){
   
 }
 
+
+
+
+
+# -------------------------------------------------------------
+# -------------------------------------------------------------
+# ROC and AUC:
+#https://developers.google.com/machine-learning/crash-course/classification/roc-and-auc
+#https://www.youtube.com/watch?v=qcvAqAH60Yw&ab_channel=StatQuestwithJoshStarmer
+
+
+# Builds a ROC result by calling the Confusion Matrix Builder
+rocBuilder <- function(obs.response, fitted.probability, toleranceVec=seq(0,1,0.1)){
+  
+  # Initialize empty Data Frame
+  rocDF <- data.frame(matrix(ncol = 4, nrow = 0))
+
+  # Loop through tolerances
+  for(tValue in toleranceVec){
+    # Build new row for rocDF
+    currErrorResult <- confusionBuilder(obs.response, fitted.probability, tValue)
+    errorDF <- currErrorResult[[2]]
+    rateVec <- c(errorDF$Error.Rate, errorDF$True.Positive.Rate, errorDF$False.Positive.Rate, tValue)
+    rocDF <- rbind(rocDF, rateVec)
+  }
+  
+  cNames <- c("Error Rate", "True Positive Rate", "False Positive Rate", "Tolerance")
+  colnames(rocDF) <- cNames
+  
+  rocPlot <-ggplot(testROCDF) +
+    aes(
+      x = `False Positive Rate`,
+      y = `True Positive Rate`,
+      colour = `Error Rate`,
+      size = Tolerance
+    ) +
+    geom_point(shape = "circle") +
+    scale_color_viridis_c(option = "plasma", direction = 1) +
+    theme_minimal()
+  
+  ggplot(rocDF) +
+    aes(
+      x = `False Positive Rate`,
+      y = `True Positive Rate`,
+      colour = `Error Rate`
+    ) +
+    geom_line(size = 0.85) +
+    scale_color_viridis_c(option = "plasma", direction = 1) +
+    theme_minimal()
+  
+  return(list(rocDF, rocPlot))
+}
+
+
+# Returns the AUC 
+simpleAUC <- function(truePositiveR, falsePositiveR){
+  
+  # inputs already sorted, best scores first 
+  dFPR <- c(diff(falsePositiveR), 0)
+  dTPR <- c(diff(truePositiveR), 0)
+  return(abs(sum(truePositiveR * dFPR) + sum(dTPR * dFPR)/2))
+
+}
+
+
+testROC <- rocBuilder(train_DustData$CASESTAT, stepwiseModel1$fitted.values, toleranceVec = seq(0,1,0.001))
+testROC[[2]]
+rocDF <- testROC[[1]]
+simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
 
 
 
