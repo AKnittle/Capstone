@@ -49,7 +49,8 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 dustData = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=',')) # OG dataset
 dustData <- dustData[-1]
 dustData$CASESTAT <- as.factor(dustData$CASESTAT)
-dustData <- na.omit(dustData[,c(1:27, 30)])
+dustData <- na.omit(dustData)
+#dustData <- na.omit(dustData[,c(1:27, 30)])
 
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
@@ -62,7 +63,11 @@ train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
 
 train_DustData.long <- gather(train_DustData, Chemical, Amount, 1:27, factor_key = TRUE)
 dustData.long <- gather(dustData, Chemical, Amount, 1:27, factor_key = TRUE)
-
+na.omit(dustData.long)
+dustData.long$SITE <- as.factor(dustData.long$SITE)
+dustData.long$GENDER <- as.factor(dustData.long$GENDER)
+dustData.long$RACEG3 <- as.factor(dustData.long$RACEG3)
+dustData.long$ageGroup <- as.factor(floor(dustData.long$AGE_REF/10))
 
 # --------------------------------------
 # Read helper script
@@ -134,7 +139,36 @@ log10TrainPlot <- ggplot(train_DustData.long) +
   theme_minimal() +
   facet_wrap(vars(CASESTAT))
 
+log2TrainPlot.bySite <- ggplot(dustData.long) +
+  aes(
+    x = SITE,
+    y = Amount,
+    fill = Chemical,
+    colour = Chemical
+  ) +
+  geom_boxplot(shape = "circle") +
+  scale_fill_hue(direction = 1) +
+  scale_color_hue(direction = 1) +
+  scale_y_continuous(trans = "log2") +
+  theme_minimal() +
+  theme(legend.position = "bottom") +
+  facet_wrap(vars(CASESTAT))
 
+
+log2TrainPlot.byAgeGroup <- ggplot(dustData.long) +
+  aes(
+    x = CASESTAT,
+    fill = ageGroup,
+    colour = ageGroup,
+    weight = Amount
+  ) +
+  geom_bar(position = "dodge") +
+  scale_fill_hue(direction = 1) +
+  scale_color_hue(direction = 1) +
+  scale_y_continuous(trans = "log2") +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  facet_wrap(vars(Chemical))
 
 ```
 
@@ -169,7 +203,32 @@ plot(lassoResult$lasso.mod, xvar = "lambda")
 ```
 
 
+```{r Model Building Full Data, echo=FALSE, fig.cap= "Model Building Full Data", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
+# Initialize Lasso Results from method
+lassoResultFull <- NA
+
+lambda <- 10^seq(10,-2,length=30)
+lassoResultFull <- buildLasso(dustData, "CASESTAT", lambda)
+
+
+coef(lassoResultFull$lasso.mod, s=lassoResultFull$bestLambda)
+predicted.classes <- ifelse(lassoResultFull$pred.lasso > 0.5, 0, 1)
+
+mean(predicted.classes == train_DustData$CASESTAT)
+
+# Plot cross validation for lambda
+plot(lassoResultFull$cv.out)
+
+plot(lassoResultFull$lasso.mod, xvar = "lambda")
+
+
+rocFull <- rocBuilder(dustData$CASESTAT, lassoResultFull$pred.lasso, toleranceVec = seq(0,1,0.001))
+rocFull[[2]]
+rocDF <- rocFull[[1]]
+simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
+
+```
 
 
 ```{r Model Building 2, echo=FALSE, fig.cap= "Model Building 2", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}

@@ -239,7 +239,7 @@ rocBuilder <- function(obs.response, fitted.probability, toleranceVec=seq(0,1,0.
   cNames <- c("Error Rate", "True Positive Rate", "False Positive Rate", "Tolerance")
   colnames(rocDF) <- cNames
   
-  rocPlot <-ggplot(testROCDF) +
+  rocPlot <-ggplot(rocDF) +
     aes(
       x = `False Positive Rate`,
       y = `True Positive Rate`,
@@ -275,10 +275,10 @@ simpleAUC <- function(truePositiveR, falsePositiveR){
 }
 
 
-testROC <- rocBuilder(train_DustData$CASESTAT, stepwiseModel1$fitted.values, toleranceVec = seq(0,1,0.001))
-testROC[[2]]
-rocDF <- testROC[[1]]
-simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
+# testROC <- rocBuilder(train_DustData$CASESTAT, stepwiseModel1$fitted.values, toleranceVec = seq(0,1,0.001))
+# testROC[[2]]
+# rocDF <- testROC[[1]]
+# simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
 
 
 
