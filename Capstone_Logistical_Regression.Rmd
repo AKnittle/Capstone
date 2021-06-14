@@ -294,13 +294,19 @@ tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(train_DustData, mod
 
 # ----------------------------------------
 
-roughPerformanceTest(train_DustData, "CASESTAT", stepwiseModel1)
+# roughPerformanceTest(train_DustData, "CASESTAT", stepwiseModel1)
 
 confusion.result <- confusionBuilder(train_DustData$CASESTAT, stepwiseModel1$fitted.values, 0.5)
 confusion.result
 
 tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(train_DustData, stepwiseModel1, 10)))
 # TODO: Out of curiosity throw everything into a logistic model
+
+rocFull <- rocBuilder(train_DustData$CASESTAT, stepwiseModel1$fitted.values, toleranceVec = seq(0,1,0.001))
+rocFull[[2]]
+rocDF <- rocFull[[1]]
+simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
+
 ```
 
 
