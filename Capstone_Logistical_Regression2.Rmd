@@ -1,0 +1,108 @@
+---
+title: "Capstone: Logistical Regression"
+author: "Andrew Knittle"
+date: "`r paste('Generated on', Sys.Date())`" 
+output: 
+  html_document: 
+    # try readable or cosmo
+    # default (default), try kable, tibble, or paged as an option
+    # Options are none (default), show, and hide
+    # default is null, try my_style_file.css
+    toc: TRUE
+    toc_depth: 3
+    toc_float: FALSE
+    highlight: haddock
+    theme: flatly
+    df_print: paged
+    code_folding: none
+    self_contained: TRUE
+---
+
+```{r setup, include=FALSE}
+# --------------------------------------
+# Clean and Prep Environment
+rm(list=ls())
+set.seed(123)
+
+# --------------------------------------
+# Load Libraries
+library(pacman)
+p_load(ggplot2)
+p_load(ISLR)
+p_load(dplyr)
+p_load(psych)
+p_load(ggpubr)
+p_load(kableExtra)
+p_load(corrplot)
+p_load(tidyverse)
+p_load(caret)
+p_load(MASS)
+p_load(glm.predict)
+p_load(glmnet)
+p_load(boot)
+p_load(pROC)
+
+# --------------------------------------
+# Read Data
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
+dustData = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=',')) # OG dataset
+dustData <- dustData[-1]
+dustData$CASESTAT <- as.factor(dustData$CASESTAT)
+dustData <- na.omit(dustData[,c(1:27, 30)])
+
+logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
+logDustData <- logDustData[-1]
+logDustData <- logDustData[-1]
+logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
+logDustData <- na.omit(logDustData[,c(1:27, 30)])
+
+train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
+#train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
+train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
+train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
+
+# --------------------------------------
+# Read helper script
+source("Exploratory_Support_Scripts.R")
+source("Script_Library.R")
+
+
+```
+
+This is a second logistical regression report focusing on **Risk Prediction** instead of diagnosing on whether someone will develop cancer or not. We start the same way we did before of building a model (In this case Logistic using Stepwise-AIC)
+
+
+```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+
+# Using the full dataset with log transformed data
+stepwiseModel2 <- glm(CASESTAT ~ ., data = logDustData, family = "binomial") %>% stepAIC(trace = FALSE)
+cat("---------------------------------\n")
+summary(stepwiseModel2)
+
+```
+
+```{r Decile Graph, echo=FALSE, fig.cap= "Decile Graph", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+# Get Deciles
+decilePredictedVals <- decileBuilder(stepwiseModel2$fitted.values)
+logDustData$decilePredictedVals <- decilePredictedVals
+
+
+# Graph Result
+decile_casestatPlot <- ggplot(logDustData) +
+  aes(x = decilePredictedVals, fill = CASESTAT) +
+  geom_bar(position = "dodge") +
+  scale_fill_hue(direction = -1) +
+  labs(x = "Decile Values", y = "Count") +
+  theme_bw() +
+  theme(legend.position = "bottom") + 
+  scale_colour_discrete(drop = FALSE) +
+  scale_x_discrete(drop=FALSE)
+decile_casestatPlot
+
+
+```
+
+

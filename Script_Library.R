@@ -283,3 +283,46 @@ simpleAUC <- function(truePositiveR, falsePositiveR){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# -------------------------------------------------------------
+# Risk Prediction Builder
+
+
+# Get the deciles for a vector of predicted values
+decileBuilder <- function(predictionVec){
+  
+  # Builds vector of deciles based on Predicted values 
+  decileVec <- as.factor(round(predictionVec, digits = 1))
+  
+  # Make sure we at least have the factor levels created if they're missing
+  if( !(0.9 %in% levels(decileVec)) ){
+    levels(decileVec) <- c(levels(decileVec), 0.9)
+  }
+  
+  if( !(1 %in% levels(decileVec)) ){
+    levels(decileVec) <- c(levels(decileVec), 1)
+  }
+  
+  return(decileVec)
+  
+}
+
+
+
+
+
+

@@ -95,6 +95,13 @@ lda.fit
 # ----------------------------------------
 errorRateTable.test
 confusionBuilder(test_DustData$CASESTAT, test.predValues, 0.5)
+
+
+rocFull <- rocBuilder(train_DustData$CASESTAT, test.predValues, toleranceVec = seq(0,1,0.001))
+rocFull[[2]]
+rocDF <- rocFull[[1]]
+simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
+
 ```
 
 ## Method
