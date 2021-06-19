@@ -105,8 +105,18 @@ buildNetwork <- function(y, x, hiddenLayerVec){
   return(list(nNet, cm))
 }
 
+# -------------------------------------------------------------
 # Test Runs
+# Single Hidden Layer(s):
 buildNetwork(cancerVal, predictMatrix, c(5))[[2]]
+buildNetwork(cancerVal, predictMatrix, c(10))[[2]]
+buildNetwork(cancerVal, predictMatrix, c(100))[[2]]
+# =============================================================
+# =============================================================
+# Two Hidden Layer(s):
+buildNetwork(cancerVal, predictMatrix, c(5, 5))[[2]]
+buildNetwork(cancerVal, predictMatrix, c(10, 10))[[2]]
+buildNetwork(cancerVal, predictMatrix, c(100, 100))[[2]]
 
 
 
