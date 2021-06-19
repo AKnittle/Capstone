@@ -81,9 +81,38 @@ buildCDTree <- function(dataset, dependentVar) {
 
 
 
+# -------------------------------------------------------------
+# Neural Networks ----------------------------------
+# https://srdas.github.io/DLBook/DeepLearningWithR.html
+# -------------------------------------------------------------
 
+# Build a Neural Network with
+#   y is the matrix (1xn) of values trying to be predicted
+#   x is the matrix (mxn) of predicting variables used
+#   hiddenLayerVec is the vector that describes the number of hidden nodes
+#   in each layer (ie: [3] is one hidden layer of 3 nodes, [2,10,3] has 3
+#   hidden layers of 2 nodes, 10 nodes, and 3 nodes)
+# This really only serves as a wrapping function, but also returns the
+# Neural Net and a confusion matrix for quick model evaluation
+buildNetwork <- function(y, x, hiddenLayerVec){
+  # train network
+  nNet <- nn.train(x, y, hidden = hiddenLayerVec)
+  predY <- nn.predict(nNet,x) # Make some predictions for confusion matrix
+  
+  yhat = matrix(0,length(predY),1)
+  yhat[which(predY > mean(predY))] = 1
+  yhat[which(predY <= mean(predY))] = 0
+  cm = table(y,yhat)
+  print(cm)
+  
+  # Make Confusion Matrix
+  # NOTE: "Script_Library.R" must be sourced
+  confusionBuilder(y,predY,mean(predY))
+  
+}
 
-
+# Test Runs
+buildNetwork(cancerVal, predictMatrix, c(5))
 
 
 
