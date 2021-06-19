@@ -99,20 +99,14 @@ buildNetwork <- function(y, x, hiddenLayerVec){
   nNet <- nn.train(x, y, hidden = hiddenLayerVec)
   predY <- nn.predict(nNet,x) # Make some predictions for confusion matrix
   
-  yhat = matrix(0,length(predY),1)
-  yhat[which(predY > mean(predY))] = 1
-  yhat[which(predY <= mean(predY))] = 0
-  cm = table(y,yhat)
-  print(cm)
-  
   # Make Confusion Matrix
   # NOTE: "Script_Library.R" must be sourced
-  confusionBuilder(y,predY,mean(predY))
-  
+  cm <- confusionBuilder(y,predY,mean(predY))
+  return(list(nNet, cm))
 }
 
 # Test Runs
-buildNetwork(cancerVal, predictMatrix, c(5))
+buildNetwork(cancerVal, predictMatrix, c(5))[[2]]
 
 
 
