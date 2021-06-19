@@ -86,7 +86,7 @@ buildCDTree <- function(dataset, dependentVar) {
 # https://srdas.github.io/DLBook/DeepLearningWithR.html
 # -------------------------------------------------------------
 
-# Build a Neural Network with
+# Build a Neural Network with deepnet package
 #   y is the matrix (1xn) of values trying to be predicted
 #   x is the matrix (mxn) of predicting variables used
 #   hiddenLayerVec is the vector that describes the number of hidden nodes
@@ -94,9 +94,9 @@ buildCDTree <- function(dataset, dependentVar) {
 #   hidden layers of 2 nodes, 10 nodes, and 3 nodes)
 # This really only serves as a wrapping function, but also returns the
 # Neural Net and a confusion matrix for quick model evaluation
-buildNetwork <- function(y, x, hiddenLayerVec){
+buildNetwork.deepnet <- function(y, x, hiddenLayerVec){
   # train network
-  nNet <- nn.train(x, y, hidden = hiddenLayerVec)
+  nNet <-  nn.train(x, y, hidden = hiddenLayerVec)
   predY <- nn.predict(nNet,x) # Make some predictions for confusion matrix
   
   # Make Confusion Matrix
@@ -105,18 +105,47 @@ buildNetwork <- function(y, x, hiddenLayerVec){
   return(list(nNet, cm))
 }
 
+# Build a Neural Network with neuralnet package
+buildNetwork.neuralnet <- function(dataset, dependentVar, hiddenLayerVec){
+  # train network
+  nNet <- neuralnet(as.formula(paste(dependentVar, "~ .")),data=dataset,hidden = hiddenLayerVec)
+  predY <- nNet$net.result[[1]] # Make some predictions for confusion matrix
+  
+  # Make Confusion Matrix
+  # NOTE: "Script_Library.R" must be sourced
+  cm <- confusionBuilder(dataset[,dependentVar],predY,mean(predY))
+  plot(nNet)
+  return(list(nNet, cm))
+}
+
 # -------------------------------------------------------------
 # Test Runs
+# buildNetwork.deepnet
 # Single Hidden Layer(s):
-buildNetwork(cancerVal, predictMatrix, c(5))[[2]]
-buildNetwork(cancerVal, predictMatrix, c(10))[[2]]
-buildNetwork(cancerVal, predictMatrix, c(100))[[2]]
+buildNetwork.deepnet(cancerVal, predictMatrix, c(5))[[2]]
+buildNetwork.deepnet(cancerVal, predictMatrix, c(10))[[2]]
+buildNetwork.deepnet(cancerVal, predictMatrix, c(100))[[2]]
 # =============================================================
 # =============================================================
 # Two Hidden Layer(s):
-buildNetwork(cancerVal, predictMatrix, c(5, 5))[[2]]
-buildNetwork(cancerVal, predictMatrix, c(10, 10))[[2]]
-buildNetwork(cancerVal, predictMatrix, c(100, 100))[[2]]
+buildNetwork.deepnet(cancerVal, predictMatrix, c(5, 5))[[2]]
+buildNetwork.deepnet(cancerVal, predictMatrix, c(10, 10))[[2]]
+buildNetwork.deepnet(cancerVal, predictMatrix, c(100, 100))[[2]]
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# buildNetwork.neuralnet
+# Single Hidden Layer(s):
+buildNetwork.neuralnet(logDustData, "CASESTAT", c(5))[[2]]
+buildNetwork.neuralnet(logDustData, "CASESTAT", c(10))[[2]]
+buildNetwork.neuralnet(logDustData, "CASESTAT", c(100))[[2]]
+# =============================================================
+# =============================================================
+# Two Hidden Layer(s):
+buildNetwork.neuralnet(logDustData, "CASESTAT", c(5, 5))[[2]]
+buildNetwork.neuralnet(logDustData, "CASESTAT", c(10, 10))[[2]]
+buildNetwork.neuralnet(logDustData, "CASESTAT", c(100, 100))[[2]]
 
 
 
