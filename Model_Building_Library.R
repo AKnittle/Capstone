@@ -106,15 +106,18 @@ buildNetwork.deepnet <- function(y, x, hiddenLayerVec){
 }
 
 # Build a Neural Network with neuralnet package
+# Similar usage to other model building methods in this file
+# Takes the dataset, what variable you want to predict, and the hiddenLayerVec
+# which works the same way as the "buildNetwork.deepnet" function
 buildNetwork.neuralnet <- function(dataset, dependentVar, hiddenLayerVec){
   # train network
   nNet <- neuralnet(as.formula(paste(dependentVar, "~ .")),data=dataset,hidden = hiddenLayerVec)
   predY <- nNet$net.result[[1]] # Make some predictions for confusion matrix
-  
+
   # Make Confusion Matrix
   # NOTE: "Script_Library.R" must be sourced
   cm <- confusionBuilder(dataset[,dependentVar],predY,mean(predY))
-  plot(nNet)
+  # plot(nNet)
   return(list(nNet, cm))
 }
 
@@ -122,15 +125,15 @@ buildNetwork.neuralnet <- function(dataset, dependentVar, hiddenLayerVec){
 # Test Runs
 # buildNetwork.deepnet
 # Single Hidden Layer(s):
-buildNetwork.deepnet(cancerVal, predictMatrix, c(5))[[2]]
-buildNetwork.deepnet(cancerVal, predictMatrix, c(10))[[2]]
-buildNetwork.deepnet(cancerVal, predictMatrix, c(100))[[2]]
-# =============================================================
-# =============================================================
-# Two Hidden Layer(s):
-buildNetwork.deepnet(cancerVal, predictMatrix, c(5, 5))[[2]]
-buildNetwork.deepnet(cancerVal, predictMatrix, c(10, 10))[[2]]
-buildNetwork.deepnet(cancerVal, predictMatrix, c(100, 100))[[2]]
+# buildNetwork.deepnet(cancerVal, predictMatrix, c(5))[[2]]
+# buildNetwork.deepnet(cancerVal, predictMatrix, c(10))[[2]]
+# buildNetwork.deepnet(cancerVal, predictMatrix, c(100))[[2]]
+# # =============================================================
+# # =============================================================
+# # Two Hidden Layer(s):
+# buildNetwork.deepnet(cancerVal, predictMatrix, c(5, 5))[[2]]
+# buildNetwork.deepnet(cancerVal, predictMatrix, c(10, 10))[[2]]
+# buildNetwork.deepnet(cancerVal, predictMatrix, c(100, 100))[[2]]
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

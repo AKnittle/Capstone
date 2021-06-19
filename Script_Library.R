@@ -76,6 +76,7 @@ lda.k.fold.validator2 <- function(df, dependentVar, K) {
 # ---------------------------------------------------------------------
 
 # Confusion Matrix Builder that takes in Observed Values, Fitted Values, and Tolerance
+# Reminder: https://i.pinimg.com/originals/18/7f/82/187f82e15145fdce5e09059eebc92b34.png
 confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) {
   t <- tibble(obs = obs.response, prob = fitted.probability)
   # count number of false positives
@@ -107,9 +108,9 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
   False.Negative.Rate <- n.fn/(n.fn+n.tp)
   
   # true positive rate
-  True.Positive.Rate <- n.tp/(n.tp+n.fn)
-  # true positive rate
-  True.Negative.Rate <- n.tn/(n.tn+n.fp)
+  True.Positive.Rate <- n.tp/(n.tp+n.fp)
+  # true negative rate
+  True.Negative.Rate <- n.tn/(n.tn+n.fn)
   
   RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, True.Positive.Rate, True.Negative.Rate)
   return(list(confusionDF, RatesDF))
