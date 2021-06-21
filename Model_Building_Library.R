@@ -106,6 +106,7 @@ buildNetwork.deepnet <- function(y, x, hiddenLayerVec){
 }
 
 # Build a Neural Network with neuralnet package
+# NOTE: This method is more computationally taxing so use wisely
 # Similar usage to other model building methods in this file
 # Takes the dataset, what variable you want to predict, and the hiddenLayerVec
 # which works the same way as the "buildNetwork.deepnet" function
@@ -120,6 +121,38 @@ buildNetwork.neuralnet <- function(dataset, dependentVar, hiddenLayerVec){
   # plot(nNet)
   return(list(nNet, cm))
 }
+
+# TODO: Do the same before but use the H2O library...
+# Build a Neural Network with h2o package
+# Takes the dataset, what variable you want to predict, and the hiddenLayerVec
+buildNetwork.H2O <- function(dataset, dependentVar, hiddenLayerVec){
+  
+  yLoc <- which(names(logDustData) == dependentVar)
+  xLoc <- which(names(logDustData) == dependentVar)
+  
+  # Start server
+  h2o.init()
+  h2o.removeAll()
+  
+  # Get data
+  train <- as.h2o(dataset)
+  test <- as.h2o(dataset)
+  
+  y <- names(train)[yLoc]
+  x <- names(train)[xLoc]
+  train[,y] = as.factor(train[,y])
+  test[,y] = as.factor(train[,y])
+  
+  # Train Model...
+  model = h2o.deeplearning(x=x, y=y, training_frame=train, validation_frame=test, 
+                           distribution = "multinomial",activation = "RectifierWithDropout",
+                           hidden = hiddenLayerVec, epochs = 5)
+  print(model)
+  # Shutdown server
+  h2o.shutdown()
+  
+}
+
 
 # -------------------------------------------------------------
 # Test Runs
@@ -140,16 +173,30 @@ buildNetwork.neuralnet <- function(dataset, dependentVar, hiddenLayerVec){
 
 # buildNetwork.neuralnet
 # Single Hidden Layer(s):
-buildNetwork.neuralnet(logDustData, "CASESTAT", c(5))[[2]]
-buildNetwork.neuralnet(logDustData, "CASESTAT", c(10))[[2]]
-buildNetwork.neuralnet(logDustData, "CASESTAT", c(100))[[2]]
-# =============================================================
-# =============================================================
-# Two Hidden Layer(s):
-buildNetwork.neuralnet(logDustData, "CASESTAT", c(5, 5))[[2]]
-buildNetwork.neuralnet(logDustData, "CASESTAT", c(10, 10))[[2]]
-buildNetwork.neuralnet(logDustData, "CASESTAT", c(100, 100))[[2]]
+# buildNetwork.neuralnet(logDustData, "CASESTAT", c(5))[[2]]
+# buildNetwork.neuralnet(logDustData, "CASESTAT", c(10))[[2]]
+# buildNetwork.neuralnet(logDustData, "CASESTAT", c(100))[[2]]
+# # =============================================================
+# # =============================================================
+# # Two Hidden Layer(s):
+# buildNetwork.neuralnet(logDustData, "CASESTAT", c(5, 5))[[2]]
+# buildNetwork.neuralnet(logDustData, "CASESTAT", c(10, 10))[[2]]
+# buildNetwork.neuralnet(logDustData, "CASESTAT", c(100, 100))[[2]]
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# buildNetwork.H2O
+# Single Hidden Layer(s):
+# buildNetwork.H2O(logDustData, "CASESTAT", c(5))
+# buildNetwork.H2O(logDustData, "CASESTAT", c(10))[[2]]
+# buildNetwork.H2O(logDustData, "CASESTAT", c(100))[[2]]
+# # =============================================================
+# # =============================================================
+# # Two Hidden Layer(s):
+# buildNetwork.H2O(logDustData, "CASESTAT", c(5, 5))[[2]]
+# buildNetwork.H2O(logDustData, "CASESTAT", c(10, 10))[[2]]
+# buildNetwork.H2O(logDustData, "CASESTAT", c(100, 100))[[2]]
 
 
 

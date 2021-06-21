@@ -115,6 +115,7 @@ decile_casestatPlot <- ggplot(logDustData) +
   scale_x_discrete(drop=FALSE)
 decile_casestatPlot
 
+#TODO: Risk calibration: make part of the cross validation
 
 ```
 

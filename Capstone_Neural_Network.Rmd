@@ -46,6 +46,7 @@ p_load(pROC)
 p_load(neuralnet)
 p_load(deepnet)
 p_load(mlbench)
+p_load(h2o)
 
 # --------------------------------------
 # Read Data
@@ -79,7 +80,7 @@ source("Script_Library.R")
 
 
 
-```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Model Building wtih deepnet, echo=FALSE, fig.cap= "Model Building with deepnet", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 # Prep the data to work with the "deepnet" package
 # https://srdas.github.io/DLBook/DeepLearningWithR.html
@@ -93,6 +94,19 @@ predictMatrix = as.matrix(logDustData[,1:27], ncol=27) # Build Matrix of predict
 buildNetwork.deepnet(cancerVal, predictMatrix, c(5))
 
 ```
+
+
+
+
+```{r Model Building wtih neuralnet, echo=FALSE, fig.cap= "Model Building with neuralnet", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+
+model.Nnet <- buildNetwork.neuralnet(logDustData, "CASESTAT", c(5))
+model.Nnet[[2]]
+plot(model.Nnet[[1]])
+```
+
+
 
 
 

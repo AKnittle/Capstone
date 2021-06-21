@@ -73,6 +73,78 @@ lda.k.fold.validator2 <- function(df, dependentVar, K) {
     summarize(train.error = mean(train.error), valid.error = mean(valid.error))
 }
 
+# Uses K as a Percentage to get folds of data, instead of a K number of folds
+# NOTE: can not take a 0% for kPerc
+crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NULL, ...) {
+  
+  
+  # ---------------------------------------------------------------------------------------
+  # Inner Helper Method:
+  # this function calculates the errors of a single fold using the fold as the holdout data
+  fold.errors <- function(df, holdout.indices, ...) {
+    
+    # Break up the data
+    train.data <- df[-holdout.indices, ]
+    holdout.data <- df[holdout.indices, ]
+    # Fit data on the training data and make predictions
+    fit <- glm(formula, data = train.data, ...)
+    
+    # Aggregate the error
+    train.rawPredict <- fit$fitted.values
+    holdout.rawPredict <- predict(fit, holdout.data)
+    train.data$train.rawPredict <- train.rawPredict
+    holdout.data$holdout.rawPredict <- holdout.rawPredict
+    
+    # See if we need to consider tolerance
+    if(!is.null(tol)){
+      train.tolPredict <- as.numeric(train.rawPredict > tol)
+      holdout.tolPredict <- as.numeric(holdout.rawPredict > tol)
+      
+      
+      train.error <- mean(train.data[,response] != train.tolPredict)
+      holdout.error <- mean(holdout.data[,dependentVar] != holdout.tolPredict)
+      
+    } else{
+      # No tolerance to worry about
+      train.error <- mean(train.data[,response] != train.rawPredict)
+      holdout.error <- mean(holdout.data[,dependentVar] != holdout.rawPredict)
+      
+      predictDF <- cbind.data.frame()
+      
+    }
+    
+  }
+  
+  # ---------------------------------------------------------------------------------------
+  
+  
+  
+  # Make a K from the percentage of rows
+  K <- floor(nrow(df)*kPerc)
+  
+  # Make index values of rows to keep track
+  #   ID: for cross validation
+  #   Alpha.ID: for original row order
+  ID <- sample(1:nrow(df))
+  Alpha.ID <- 1:nrow(df)
+  df$ID <- ID
+  df$Alpha.ID <- Alpha.ID
+  
+  # Prepare the folds being used
+  folds <- cut(ID, breaks = K, labels = F)
+  
+  # Initialize error to 0 to begin accumulation of fold error rates
+  errors <- tibble()
+  # iterate on the number of folds
+  for (i in 1:K) {
+    holdout.indices <- which(folds == i, arr.ind = T)
+    folded.errors <- fold.errors(df, holdout.indices, ...) # Call Helper method to get errors
+    errors <- bind_rows(errors, folded.errors)
+  }
+  
+}
+
+
 # ---------------------------------------------------------------------
 
 # Confusion Matrix Builder that takes in Observed Values, Fitted Values, and Tolerance
@@ -103,14 +175,14 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
   Error.Rate <- (n.fp + n.fn)/nrow(t)
   
   # false positive rate
-  False.Positive.Rate <- n.fp/(n.tn+n.fp)
+  False.Positive.Rate <- n.fp/(n.tn+n.fp) # Ideal is close to 0
   # false negative rate
-  False.Negative.Rate <- n.fn/(n.fn+n.tp)
+  False.Negative.Rate <- n.fn/(n.fn+n.tp) # Ideal is close to 0
   
   # true positive rate
-  True.Positive.Rate <- n.tp/(n.tp+n.fp)
+  True.Positive.Rate <- n.tp/(n.tp+n.fp) # Ideal is close to 1
   # true negative rate
-  True.Negative.Rate <- n.tn/(n.tn+n.fn)
+  True.Negative.Rate <- n.tn/(n.tn+n.fn) # Ideal is close to 1
   
   RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, True.Positive.Rate, True.Negative.Rate)
   return(list(confusionDF, RatesDF))
