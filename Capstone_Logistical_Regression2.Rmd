@@ -118,5 +118,9 @@ decile_casestatPlot
 #TODO: Risk calibration: make part of the cross validation
 
 ```
+```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
+
+
+```
 
