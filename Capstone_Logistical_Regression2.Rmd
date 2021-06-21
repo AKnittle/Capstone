@@ -120,7 +120,40 @@ decile_casestatPlot
 ```
 ```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
+cvResult <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
+                                      formula = stepwiseModel2$formula, tol = 0.5, family="binomial")
 
+
+beforeCross <- cvResult[[2]]
+trainCross <- cvResult[[3]]
+validCross <- cvResult[[4]]
+trainCross$decilePredictedVals <- decileBuilder(trainCross$train.rawPredict)
+validCross$decilePredictedVals <- decileBuilder(validCross$holdout.rawPredict)
+
+
+# Graph Result
+trainCrossPlot <- ggplot(trainCross) +
+  aes(x = decilePredictedVals, fill = Response) +
+  geom_bar(position = "dodge") +
+  scale_fill_hue(direction = -1) +
+  labs(x = "Decile Values", y = "Count") +
+  theme_bw() +
+  theme(legend.position = "bottom") + 
+  scale_colour_discrete(drop = FALSE) +
+  scale_x_discrete(drop=FALSE)
+
+validCrossPlot <- ggplot(validCross) +
+  aes(x = decilePredictedVals, fill = Response) +
+  geom_bar(position = "dodge") +
+  scale_fill_hue(direction = -1) +
+  labs(x = "Decile Values", y = "Count") +
+  theme_bw() +
+  theme(legend.position = "bottom") + 
+  scale_colour_discrete(drop = FALSE) +
+  scale_x_discrete(drop=FALSE)
+
+trainCrossPlot
+validCrossPlot
 
 ```
 

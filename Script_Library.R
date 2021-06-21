@@ -88,6 +88,7 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
     holdout.data <- df[holdout.indices, ]
     # Fit data on the training data and make predictions
     fit <- glm(formula, data = train.data, ...)
+    # print(fit$family)
     
     # Aggregate the error
     train.rawPredict <- fit$fitted.values
@@ -116,7 +117,7 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
     } else{
       # No tolerance to worry about
       train.error <- mean(train.data[,response] != train.rawPredict)
-      holdout.error <- mean(holdout.data[,dependentVar] != holdout.rawPredict)
+      holdout.error <- mean(holdout.data[,response] != holdout.rawPredict)
       
       # Aggregate Data for records and return results
       errorTib <- tibble(train.error = train.error, valid.error = holdout.error)
@@ -134,6 +135,7 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
   
   # Make a K from the percentage of rows
   K <- floor(nrow(df)*kPerc)
+  # print(K)
   
   # Make index values of rows to keep track
   #   ID: for cross validation
@@ -160,7 +162,7 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
     errors <- bind_rows(errors, folded.errors)
   }
   # Return results and let god sort them out
-  return(list(errors, trainDF, validDF))
+  return(list(errors, df, trainDF, validDF))
 }
 
 
