@@ -77,8 +77,11 @@ source("Script_Library.R")
 
 ```
 
+# Methods
 
+So what exactly are neural networks? 
 
+# Model Building
 
 ```{r Model Building wtih deepnet, echo=FALSE, fig.cap= "Model Building with deepnet", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 

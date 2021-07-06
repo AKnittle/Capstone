@@ -92,7 +92,7 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
     
     # Aggregate the error
     train.rawPredict <- fit$fitted.values
-    holdout.rawPredict <- predict(fit, holdout.data)
+    holdout.rawPredict <- predict(fit, holdout.data, type="response")
     train.data$train.rawPredict <- train.rawPredict
     holdout.data$holdout.rawPredict <- holdout.rawPredict
     

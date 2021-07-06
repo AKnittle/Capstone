@@ -157,3 +157,48 @@ validCrossPlot
 
 ```
 
+
+
+
+
+# Method
+
+Even though Logistic Regression is old hat it's not bad to review of how it works. A [great write up on Logistic Regression can be found here](https://christophm.github.io/interpretable-ml-book/logistic.html), but I will do my best to summarize without being too dense.
+
+To start off let's answer why we should use logistic regression, instead of say Linear Regression (for those who already know why, or those who think they're "too clever" can skip this paragraph). Well Linear Regression tries to answer the question of "given some value of a set of feature(s)/independent variable(s)/predictor(s) what amount will dependent variable/response likely be". You can probably see already where this is going, but it doesn't give you a binary, or "yes or no", result which is what we are looking for in this project. We want to determine if you have cancer, not how much cancer you have.
+
+Logistic Regression models the "*probabilities* for classification problems with two possible outcomes." In order to do this regression model uses it's name sake, the logistic function:
+
+$$
+f(x)=\frac{L}{1+e^{-k(x-x_0)}}
+$$
+
+* $f(x)$ = output of the function
+
+* $L$ = the curve's maximum value
+
+* $k$	=	logistic growth rate or steepness of the curve
+
+* $x_0$ = the x value of the sigmoid midpoint
+
+* $x$ = real number
+
+To make it into a logistic regression model we take the foundation and tweak it a little to use predictor variables, and since this is for classification purposes we want probabilities between 0 and 1 (so $L=1$).
+
+$$
+P(y^{i}=1)=\frac{1}{1+e^{-(\beta_0+\beta_1x_1^i+...+\beta_px_p^p)}}
+$$
+
+Now that our output is in probability, between 0 and 1, the weights are no longer in linear form. The weights/coefficients are now in terms of log odds, "probability of event divided by probability of no event". This does make interpreting your model obviously pretty difficult since it's not a simple weighted value for coefficients.
+
+
+
+
+
+
+
+
+
+
+
+

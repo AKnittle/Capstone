@@ -1,0 +1,141 @@
+---
+title: "Capstone: Neural Network"
+author: "Andrew Knittle"
+date: "`r paste('Generated on', Sys.Date())`" 
+output: 
+  html_document: 
+    # try readable or cosmo
+    # default (default), try kable, tibble, or paged as an option
+    # Options are none (default), show, and hide
+    # default is null, try my_style_file.css
+    toc: TRUE
+    toc_depth: 3
+    toc_float: FALSE
+    highlight: haddock
+    theme: flatly
+    df_print: paged
+    code_folding: none
+    self_contained: TRUE
+---
+
+```{r setup, include=FALSE}
+# --------------------------------------
+# Clean and Prep Environment
+rm(list=ls())
+set.seed(123)
+
+# --------------------------------------
+# Load Libraries
+library(pacman)
+p_load(ggplot2)
+p_load(dplyr)
+p_load(psych)
+p_load(ggpubr)
+p_load(kableExtra)
+p_load(corrplot)
+p_load(tidyverse)
+p_load(caret)
+p_load(MASS)
+p_load(ISLR)
+p_load(glm.predict)
+p_load(glmnet)
+p_load(modelr)
+p_load(boot)
+p_load(pROC)
+
+p_load(neuralnet)
+p_load(deepnet)
+p_load(mlbench)
+p_load(h2o)
+
+# --------------------------------------
+# Read Data
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
+dustData = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=',')) # OG dataset
+dustData <- dustData[-1]
+dustData$CASESTAT <- as.factor(dustData$CASESTAT)
+dustData <- na.omit(dustData[,c(1:27, 30)])
+
+logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
+logDustData <- logDustData[-1]
+logDustData <- logDustData[-1]
+logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
+logDustData <- na.omit(logDustData[,c(1:27, 30)])
+
+train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
+#train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
+train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
+train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
+
+# --------------------------------------
+# Read helper script
+source("Exploratory_Support_Scripts.R")
+source("CrossValidation_Library.R")
+source("Script_Library.R")
+
+
+```
+
+# What is Risk Prediction?
+
+*Risk Prediction* is a side of stats that really only appears in [public health related fields](https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction) For example a public health question could be:
+
+* **Question Regarding Risk**: How many public housing residents will have a heart attack this year?
+
+* **Decision Based upon Risk**: Quantity and location of defibrillators in housing projects.
+
+Another example, in terms of Clinical Medicine could be:
+
+* **Question Regarding Risk**: Will I have a migraine?
+
+* **Decision Based upon Risk**: pain killers or no pain killers
+
+To develop a meaningful Risk Prediction model it needs to follow the procedure called "Transparent Reporting of a multivariable prediction model for Individual Prognosis or Diagnosis", or just TRIPOD for short.
+
+## TRIPOD
+
+In order to get an idea of what TRIPOD is and how it works it's best [if we walk through each step.](https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction#Description)
+![Image name](https://www.publichealth.columbia.edu/sites/default/files/png/Screen-Shot-2015-06-17-at-11.36.46-AM.png)
+
+### Step 1: Callibration
+
+Here we're looking for "overall performance"; think $R^2$. Although if you're using a logistic regression model you can a goodness of fit test like Hosmer Lemeshow. [The Hosmer-Lemeshow test will provide a p-value, which reflects the probability that your null hypothesis – that there is no difference between the distribution of predicted and observed outcomes across quantiles – is correct (in other words, this is a situation in which a very large p-value should make the analyst quite pleased).](https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction#Description). Often people use Decile Plots (see my Capstone: Logistical Regression 2 report) to get an idea of how well calibrated the model is. 
+In conjunction with the Hosmer Lemeshow test using Calibration Plots, with predicted values on the x-axis and observed values on the y-axis, are used to see how well your model makes predictions. In it you'll want to see a slope close to 1, less than 1 indicates overfitted models and greater than 1 indicates underfitted models.
+
+![Image name](https://www.publichealth.columbia.edu/sites/default/files/png/Screen-Shot-2015-06-17-at-11.42.34-AM.png)
+
+
+### Step 2: Discrimination
+
+Now that we've calibrated the model it's time to see how well a model differentiates between subjects with a certain outcome. What is the *probability* that you don’t have the disease/condition given a negative test?
+
+![Image name](https://www.publichealth.columbia.edu/sites/default/files/png/Screen-Shot-2015-06-17-at-11.44.21-AM.png)
+
+It is very important to ["remember that these predictive values hinge on the prevalence (or, in Bayesian language, the prior probability) of disease in a given sample, so they may vary across validation samples."](https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction#Description) Instead of using predictive values most people trying to develop accurate models rely on "receiver operating curves", or ROCs (you can find these graphs throughout this project). ROC graphs plot *sensitivity* (the true positive rate [TPR]) and *specificity* (1 – false positive rate [FPR]). The diagonal in the graph represents ["anticipated performance of a useless test, or chance alone".](https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction#Description) The best performance for discrimination is when the line of TPR and FPR gets closer to upper left hand corner of the graph. The greater curve to that upper left corner the greater the *Area Under the Curve*(AUC), which can be used as a stat for performance. You can also use the ROC graph to pick the ideal threshold by finding the highest Youden’s index, or the highest point from the diagonal line of the graph to the ROC line plotted.
+
+
+
+### Step 3: Decision Analysis
+
+This is the last step and it comes down to simply how practical of a solution we can come up with, or "how and when will the predictions impact actual decisions?" This is where the "rubber meets the road" when trying making a solution practical or even trying. For example given a probability for having a minor disease would it be worth it to conduct an invasive biopsy?
+
+A technique for determining whether or not to take action was developed by [CS Pierce](https://en.wikipedia.org/wiki/Charles_Sanders_Peirce) as ["Pierce’s Net Benefit (NB)"](https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction#Description). The *Net Benefit*, NB, can be calculated as $NB=benefit*(True~Positive~Rate)-harm(False~Positive~Rate)$. It's a useful tool for summarizing results but hard to put into real world units (Money, Blood Amount, Water, etc.).
+
+Using NB we can do something called "Decision Curve Analysis". 
+![Image name](https://www.publichealth.columbia.edu/sites/default/files/png/Screen-Shot-2015-06-17-at-11.49.37-AM.png)
+Treatment only occurs under a specific range: The "Treat if score>x" line must be above "Treat none"(when NB=0), and above the "Treat all" line. Here's a more real world example that can help.
+![Image name](https://www.publichealth.columbia.edu/sites/default/files/png/Screen-Shot-2015-06-17-at-11.51.17-AM.png)
+
+["For sore throat (disease), should you use a throat culture to determine whether to treat with antibiotics (decision)? If you weigh the harm of overtreatment with antibiotics against the benefit of appropriate treatment with antibiotics at 1:9 (threshold probability = 10%), then using this decision rule identifies 30 true positives per 100 patients without any overtreatment (net benefit)."](https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction#Description)
+
+
+# Why Risk Prediction?
+
+We Considered pivoting the project from a question of diagnosis to a public health question after having several models return back results that were no better than flipping a coin. Framing this in the realm of public health is where Risk Prediction comes into play.
+
+We began by looking at decile plots that came from logistic regression models. 
+
+
+
+
