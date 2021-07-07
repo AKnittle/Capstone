@@ -125,22 +125,46 @@ cvResult <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT",
 
 
 beforeCross <- cvResult[[2]]
-trainCross <- cvResult[[3]]
+# trainCross <- cvResult[[3]]
 validCross <- cvResult[[4]]
-trainCross$decilePredictedVals <- decileBuilder(trainCross$train.rawPredict)
+# trainCross$decilePredictedVals <- decileBuilder(trainCross$train.rawPredict)
 validCross$decilePredictedVals <- decileBuilder(validCross$holdout.rawPredict)
 
+decileBins <- seq(0,1, 0.1)
+decileProp <- data.frame()
+for(i in decileBins){
+  print(i)
+  tempSet <- subset(validCross, decilePredictedVals==i)
+  countPerDec <- table(tempSet$Response)
+  tempDF <- cbind.data.frame(countPerDec[[1]], countPerDec[[2]], i)
+  decileProp <- rbind(decileProp, tempDF)
+}
+colnames(decileProp) <- c("0", "1", "Decile")
+
+proportionGetter <-  function(x){
+  denom <- sum(x[1],x[2])
+  finalProp <- x[2]/denom
+  return(finalProp)
+}
+
+proportionGetter <-  function(x){
+  meanVal <- sum(x[1],x[2])
+  return(meanVal)
+}
+
+props <- apply(decileProp, 1, proportionGetter)
+decileProp$props <- props
 
 # Graph Result
-trainCrossPlot <- ggplot(trainCross) +
-  aes(x = decilePredictedVals, fill = Response) +
-  geom_bar(position = "dodge") +
-  scale_fill_hue(direction = -1) +
-  labs(x = "Decile Values", y = "Count") +
-  theme_bw() +
-  theme(legend.position = "bottom") + 
-  scale_colour_discrete(drop = FALSE) +
-  scale_x_discrete(drop=FALSE)
+# trainCrossPlot <- ggplot(trainCross) +
+#   aes(x = decilePredictedVals, fill = Response) +
+#   geom_bar(position = "dodge") +
+#   scale_fill_hue(direction = -1) +
+#   labs(x = "Decile Values", y = "Count") +
+#   theme_bw() +
+#   theme(legend.position = "bottom") + 
+#   scale_colour_discrete(drop = FALSE) +
+#   scale_x_discrete(drop=FALSE)
 
 validCrossPlot <- ggplot(validCross) +
   aes(x = decilePredictedVals, fill = Response) +
@@ -152,8 +176,15 @@ validCrossPlot <- ggplot(validCross) +
   scale_colour_discrete(drop = FALSE) +
   scale_x_discrete(drop=FALSE)
 
-trainCrossPlot
+# trainCrossPlot
 validCrossPlot
+
+
+ggplot(decileProp) +
+  aes(x = Decile, y = props) +
+  geom_line(size = 0.5, colour = "#461112") +
+  theme_bw() +
+  ylim(0L, 1L)
 
 ```
 

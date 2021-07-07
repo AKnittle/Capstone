@@ -94,6 +94,7 @@ It's important to note that the leaf nodes are likely impure; each has a mixture
 $$
 Impurity_{Overall} = (\frac{(Pop_{Left})}{(Pop_{Left} + Pop_{Right})}*Impurity_{Left}) + (\frac{(Pop_{Right})}{(Pop_{Left} + Pop_{Right})}*Impurity_{Right})
 $$
+
 ### 3.
 
 After Calculating the Overall Impurity for each Independent Variable we pick the one with the lowest Impurity to be the root of the tree.
@@ -152,6 +153,8 @@ print(testTree3)
 plot(testTree3)
 
 ```
+
+# Interpretting the Model
 
 
 
