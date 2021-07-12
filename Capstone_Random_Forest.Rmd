@@ -85,11 +85,20 @@ For a good performing tree it needs to follow two criteria:
 
 * 2: [The predictions (and therefore the errors) made by the individual trees need to have low correlations with each other.](https://towardsdatascience.com/understanding-random-forest-58381e0602d2)
 
+### Diverse Trees
+
+In order to make a forest diverse, in other words making sure each tree has low correlation with each other, we can use two well used options: **Bagging (Bootstrap Aggregation)** or **Feature Randomness**.
+
+
+#### Bagging
 
 
 
+#### Feature Randomness
 
 
+
+![Image name](https://miro.medium.com/max/1000/1*EemYMyOADnT0lJWSXmTDdg.jpeg)
 
 
 
