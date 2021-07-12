@@ -1,0 +1,107 @@
+---
+title: "Capstone: Random Forest"
+author: "Andrew Knittle"
+date: "`r paste('Generated on', Sys.Date())`" 
+output: 
+  html_document: 
+    # try readable or cosmo
+    # default (default), try kable, tibble, or paged as an option
+    # Options are none (default), show, and hide
+    # default is null, try my_style_file.css
+    toc: TRUE
+    toc_depth: 3
+    toc_float: FALSE
+    highlight: haddock
+    theme: flatly
+    df_print: paged
+    code_folding: none
+    self_contained: TRUE
+---
+
+```{r setup, include=FALSE}
+# --------------------------------------
+# Clean and Prep Environment
+rm(list=ls())
+set.seed(123)
+
+# --------------------------------------
+# Load Libraries
+library(pacman)
+p_load(ggplot2)
+p_load(ISLR)
+p_load(dplyr)
+p_load(psych)
+p_load(ggpubr)
+p_load(kableExtra)
+p_load(tidyverse)
+p_load(caret)
+p_load(MASS)
+p_load(glm.predict)
+p_load(glmnet)
+p_load(leaps)
+p_load(partykit)
+
+# --------------------------------------
+# Read Data
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
+logDustData <- logDustData[-1]
+logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
+
+train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
+#train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
+train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
+train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
+# --------------------------------------
+# Read helper script
+source("Exploratory_Support_Scripts.R")
+source("Script_Library.R")
+source("Model_Building_Library.R")
+
+
+
+```
+
+
+# What is Random Forest and how does it work?
+
+## Background: Decision Trees
+
+![Image name](https://miro.medium.com/max/1000/1*LMoJmXCsQlciGTEyoSN39g.jpeg)
+
+Before reading this section it would be worth while to read on the report on *Conditional Decision Trees* I wrote because this report builds on that. You can also read this [blog post that explains both Conditional Decision Trees and Random Forest, as I quote from it quite a bit myself](https://towardsdatascience.com/understanding-random-forest-58381e0602d2) In short Decision Trees separate different features of data at nodes for classification (if "red" take left path, if "blue" take right path). A Tree usually consists of several branches where each leads to "another tree"; these are recursive structures that contain same pattern repeated until some edge case in the form of a leaf node.
+
+## Random Forests
+
+Random Forests take Decision Trees and make well a "forest" of them. Each individual tree in the forest returns a classification result (A or B) and the result with the most votes is what the forest predicts classification as. For example if a forest of 10 trees is used to classify something as *Red* or *Blue*, and 7 trees returned *Blue* then the forest would return *Blue*. The results get democratized!   
+
+![Image name](https://miro.medium.com/max/1000/1*VHDtVaDPNepRglIAv72BFg.jpeg)
+
+Random Forests work when a ["large number of relatively uncorrelated models (trees) operating as a committee will outperform any of the individual constituent models."](https://towardsdatascience.com/understanding-random-forest-58381e0602d2) The most important part of a forest working well is that each tree has low correlation between other trees. You can think of each tree as a juror, you want a diverse set of people as jurors because together as collection should cancel out any other juror's bias; the last thing you want in a fair trial is a jury that is rigged!
+
+For a good performing tree it needs to follow two criteria:
+
+* 1: [There needs to be some actual signal in our features so that models built using those features do better than random guessing.](https://towardsdatascience.com/understanding-random-forest-58381e0602d2)
+
+* 2: [The predictions (and therefore the errors) made by the individual trees need to have low correlations with each other.](https://towardsdatascience.com/understanding-random-forest-58381e0602d2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
