@@ -40,6 +40,9 @@ p_load(glm.predict)
 p_load(glmnet)
 p_load(leaps)
 p_load(partykit)
+p_load(randomForest)
+# TODO: The package ROCR can ploxt ROC curves and calculate AUC... might want to revisit a few things
+p_load(ROCR)
 
 # --------------------------------------
 # Read Data
@@ -47,6 +50,7 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
+logDustData <- na.omit(logDustData)
 
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
 #train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
@@ -92,21 +96,89 @@ In order to make a forest diverse, in other words making sure each tree has low 
 
 #### Bagging
 
-
+<Each tree samples with replacement>
 
 #### Feature Randomness
 
-
+<Some get some features and others don't>
 
 ![Image name](https://miro.medium.com/max/1000/1*EemYMyOADnT0lJWSXmTDdg.jpeg)
 
 
 
 
+# Building the Model
+
+[I recommend reading this blog post for the intricate details and how to make your own Random Forest in R](https://www.blopig.com/blog/2017/04/a-very-basic-introduction-to-random-forests-using-r/)
+
+```{r Model Building 1, echo=FALSE, fig.cap= "Model Building 1", out.height="100%", out.width="100%", warning=FALSE,  comment=FALSE, warning=FALSE}
+
+# Build a random forest with all variables
+# ntree is the number of trees in the forest
+# mtry is number of random features selected per tree
+# importance enables the algorithm to calculate variable importance (Not set here)
+rfCancer_t100f5 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=5)
+rfCancer_t100f10 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=10)
+rfCancer_t100f15 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=15)
+
+# ------------------------------------------------
+# OOB = Out Of Bag Error
+rfCancer_t100f5
+rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f5$predicted)))
+
+# ------------------------------------------------
+
+rfCancer_t100f10
+rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f10$predicted)))
+
+# ------------------------------------------------
+
+rfCancer_t100f15
+rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f15$predicted)))
 
 
+# ROC and AUC graphs
+
+pred_rfCancer_t100f5 <- predict(rfCancer_t100f5,logDustData,type="prob")
+# pred_rfCancer_t100f5 <- na.omit(pred_rfCancer_t100f5)
+classes <- levels(logDustData$CASESTAT)
+true_values <- ifelse(logDustData$CASESTAT==classes,1,0)
+
+predResultsDF <- cbind.data.frame(pred_rfCancer_t100f5, true_values)
+predResultsDF <- na.omit(predResultsDF)
+
+pred <- prediction(pred_rfCancer_t100f5[,1],true_values)
+perf <- performance(pred, "tpr", "fpr")
+plot(perf,main="ROC Curve") 
+auc.perf <- performance(pred, measure = "auc")
+print(auc.perf@y.values)
+# rocBuilder(logDustData$CASESTAT, pred_rfCancer_t100f5, toleranceVec = seq(0,1,0.001))
+
+```
 
 
+```{r Model Building 2, echo=FALSE, fig.cap= "Model Building 2", out.height="100%", out.width="100%", warning=FALSE,  comment=FALSE, warning=FALSE}
+
+rfCancer_t200f5 <- randomForest(CASESTAT ~ ., train_DustData, ntree=200, mtry=5)
+rfCancer_t200f10 <- randomForest(CASESTAT ~ ., train_DustData, ntree=200, mtry=10)
+rfCancer_t200f15 <- randomForest(CASESTAT ~ ., train_DustData, ntree=200, mtry=15)
+
+# ------------------------------------------------
+
+rfCancer_t200f5
+rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t200f5$predicted)))
+
+# ------------------------------------------------
+
+rfCancer_t200f10
+rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t200f10$predicted)))
+
+# ------------------------------------------------
+
+rfCancer_t200f15
+rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t200f15$predicted)))
+
+```
 
 
 

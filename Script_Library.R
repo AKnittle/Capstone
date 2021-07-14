@@ -168,7 +168,8 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
 
 # ---------------------------------------------------------------------
 
-# Confusion Matrix Builder that takes in Observed Values, Fitted Values, and Tolerance
+# IMPORTANT: Used for Probabilities
+# Confusion Matrix Builder that takes in Observed Values, Fitted Values (probabilities), and Tolerance
 # Reminder: https://i.pinimg.com/originals/18/7f/82/187f82e15145fdce5e09059eebc92b34.png
 confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) {
   t <- tibble(obs = obs.response, prob = fitted.probability)
@@ -187,6 +188,48 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
   # true negatives
   n.tn <- t %>%
     filter(obs == 0 & prob < passedTolerance) %>%
+    nrow()
+  Observed.NO <- c(n.tn, n.fp) # True Negative, False Positive
+  Observed.YES <- c(n.fn, n.tp) # False Negative, True Positive
+  confusionDF <- data.frame(Observed.NO, Observed.YES, row.names = c("Predicted.NO", "Predicted.YES"))
+  
+  # error rate
+  Error.Rate <- (n.fp + n.fn)/nrow(t)
+  
+  # false positive rate
+  False.Positive.Rate <- n.fp/(n.tn+n.fp) # Ideal is close to 0
+  # false negative rate
+  False.Negative.Rate <- n.fn/(n.fn+n.tp) # Ideal is close to 0
+  
+  # true positive rate
+  True.Positive.Rate <- n.tp/(n.tp+n.fp) # Ideal is close to 1
+  # true negative rate
+  True.Negative.Rate <- n.tn/(n.tn+n.fn) # Ideal is close to 1
+  
+  RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, True.Positive.Rate, True.Negative.Rate)
+  return(list(confusionDF, RatesDF))
+}
+
+# IMPORTANT: Used for that return classified values, NOT probabilities
+# Confusion Matrix Builder that takes in Observed Values, Fitted Values
+# Reminder: https://i.pinimg.com/originals/18/7f/82/187f82e15145fdce5e09059eebc92b34.png
+rawConfusionBuilder <- function(obs.response, fitted.response) {
+  t <- tibble(obs = obs.response, prob = fitted.response)
+  # count number of false positives
+  n.fp <- t %>%
+    filter(obs == 0 & prob == 1) %>%
+    nrow()
+  # false negatives
+  n.fn <- t %>%
+    filter(obs == 1 & prob == 0) %>%
+    nrow()
+  # true positives
+  n.tp <- t %>%
+    filter(obs == 1 & prob == 1) %>%
+    nrow()
+  # true negatives
+  n.tn <- t %>%
+    filter(obs == 0 & prob == 0) %>%
     nrow()
   Observed.NO <- c(n.tn, n.fp) # True Negative, False Positive
   Observed.YES <- c(n.fn, n.tp) # False Negative, True Positive
