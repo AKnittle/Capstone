@@ -243,6 +243,22 @@ simpleAUC <- function(truePositiveR, falsePositiveR){
 
 }
 
+# Uses libraries to build ROC and AUC... not that I don't trust my own builders
+rocByLibrary <- function(model, data, dependentVar){
+  
+  predictedVals <- predict(model,data,type="prob")
+  classes <- levels(dependentVar)
+  true_values <- ifelse(dependentVar==classes,1,0)
+  
+  #predResultsDF <- cbind.data.frame(predictedVals, true_values)
+  
+  pred <- prediction(predictedVals[,1],true_values)
+  perf <- performance(pred, "tpr", "fpr")
+  print(plot(perf,main="ROC Curve"))
+  auc.perf <- performance(pred, measure = "auc")
+  print(auc.perf@y.values)
+  
+}
 
 # testROC <- rocBuilder(train_DustData$CASESTAT, stepwiseModel1$fitted.values, toleranceVec = seq(0,1,0.001))
 # testROC[[2]]

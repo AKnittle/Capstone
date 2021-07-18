@@ -140,20 +140,20 @@ rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t1
 
 # ROC and AUC graphs
 
-pred_rfCancer_t100f5 <- predict(rfCancer_t100f5,logDustData,type="prob")
-# pred_rfCancer_t100f5 <- na.omit(pred_rfCancer_t100f5)
-classes <- levels(logDustData$CASESTAT)
-true_values <- ifelse(logDustData$CASESTAT==classes,1,0)
-
-predResultsDF <- cbind.data.frame(pred_rfCancer_t100f5, true_values)
-predResultsDF <- na.omit(predResultsDF)
-
-pred <- prediction(pred_rfCancer_t100f5[,1],true_values)
-perf <- performance(pred, "tpr", "fpr")
-plot(perf,main="ROC Curve") 
-auc.perf <- performance(pred, measure = "auc")
-print(auc.perf@y.values)
+# pred_rfCancer_t100f5 <- predict(rfCancer_t100f5,logDustData,type="prob")
+# classes <- levels(logDustData$CASESTAT)
+# true_values <- ifelse(logDustData$CASESTAT==classes,1,0)
+# 
+# predResultsDF <- cbind.data.frame(pred_rfCancer_t100f5, true_values)
+# 
+# pred <- prediction(pred_rfCancer_t100f5[,1],true_values)
+# perf <- performance(pred, "tpr", "fpr")
+# plot(perf,main="ROC Curve") 
+# auc.perf <- performance(pred, measure = "auc")
+# print(auc.perf@y.values)
 # rocBuilder(logDustData$CASESTAT, pred_rfCancer_t100f5, toleranceVec = seq(0,1,0.001))
+
+
 
 ```
 
