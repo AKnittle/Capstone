@@ -106,15 +106,15 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
   # error rate
   Error.Rate <- (n.fp + n.fn)/nrow(t)
   
-  # false positive rate
+  # false positive rate (Fall Out)
   False.Positive.Rate <- n.fp/(n.tn+n.fp) # Ideal is close to 0
-  # false negative rate
+  # false negative rate (Miss Rate)
   False.Negative.Rate <- n.fn/(n.fn+n.tp) # Ideal is close to 0
   
-  # true positive rate
-  True.Positive.Rate <- n.tp/(n.tp+n.fp) # Ideal is close to 1
-  # true negative rate
-  True.Negative.Rate <- n.tn/(n.tn+n.fn) # Ideal is close to 1
+  # true positive rate (Sensitivity)
+  True.Positive.Rate <- n.tp/(n.tp+n.fn) # Ideal is close to 1
+  # true negative rate (Specificity)
+  True.Negative.Rate <- n.tn/(n.tn+n.fp) # Ideal is close to 1
   
   RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, True.Positive.Rate, True.Negative.Rate)
   return(list(confusionDF, RatesDF))
@@ -244,19 +244,31 @@ simpleAUC <- function(truePositiveR, falsePositiveR){
 }
 
 # Uses libraries to build ROC and AUC... not that I don't trust my own builders
-rocByLibrary <- function(model, data, dependentVar){
+rocByLibrary <- function(model, data, dependentVar, ...){
   
-  predictedVals <- predict(model,data,type="prob")
+  predictedVals <- predict(model,data, ...)
   classes <- levels(dependentVar)
   true_values <- ifelse(dependentVar==classes,1,0)
   
-  #predResultsDF <- cbind.data.frame(predictedVals, true_values)
+  # To make this more agnostic of modeling methods we need to see what
+  # kinds of models we have to break up things here. Get the name of 
+  # "..." and their values
+  args <- list(...)
+  for(i in 1:length(args)) {
+    assign(x = names(args)[i], value = args[[i]])
+  }
+  if(!is.null(type) & type == "response"){
+    roc(dependentVar ~ predictedVals, plot = TRUE, print.auc = TRUE)
+    return()
+  }
   
+  #predResultsDF <- cbind.data.frame(predictedVals, true_values)
   pred <- prediction(predictedVals[,1],true_values)
   perf <- performance(pred, "tpr", "fpr")
   print(plot(perf,main="ROC Curve"))
   auc.perf <- performance(pred, measure = "auc")
-  print(auc.perf@y.values)
+  aucVal <- auc.perf@y.values
+  return(aucVal)
   
 }
 

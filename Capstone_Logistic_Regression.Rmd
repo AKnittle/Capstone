@@ -308,6 +308,9 @@ rocFull[[2]]
 rocDF <- rocFull[[1]]
 simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
 
+
+rocByLibrary(stepwiseModel1, train_DustData, train_DustData$CASESTAT, type="response")
+
 ```
 
 
