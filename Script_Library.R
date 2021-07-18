@@ -73,97 +73,7 @@ lda.k.fold.validator2 <- function(df, dependentVar, K) {
     summarize(train.error = mean(train.error), valid.error = mean(valid.error))
 }
 
-# Uses K as a Percentage to get folds of data, instead of a K number of folds
-# NOTE: can not take a 0% for kPerc
-crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NULL, ...) {
-  
-  
-  # ---------------------------------------------------------------------------------------
-  # Inner Helper Method:
-  # this function calculates the errors of a single fold using the fold as the holdout data
-  fold.errors <- function(df, holdout.indices, ...) {
-    
-    # Break up the data
-    train.data <- df[-holdout.indices, ]
-    holdout.data <- df[holdout.indices, ]
-    # Fit data on the training data and make predictions
-    fit <- glm(formula, data = train.data, ...)
-    # print(fit$family)
-    
-    # Aggregate the error
-    train.rawPredict <- fit$fitted.values
-    holdout.rawPredict <- predict(fit, holdout.data, type="response")
-    train.data$train.rawPredict <- train.rawPredict
-    holdout.data$holdout.rawPredict <- holdout.rawPredict
-    
-    # See if we need to consider tolerance
-    if(!is.null(tol)){
-      # See if by the this tolerance whether or not it was true; (value > tol) = TRUE
-      train.tolPredict <- as.numeric(train.rawPredict > tol)
-      holdout.tolPredict <- as.numeric(holdout.rawPredict > tol)
-      train.error <- mean(train.data[,response] != train.tolPredict)
-      holdout.error <- mean(holdout.data[,response] != holdout.tolPredict)
-      
-      # Aggregate Data for records and return results
-      errorTib <- tibble(train.error = train.error, valid.error = holdout.error)
-      trainResultsDF <- cbind.data.frame(train.data$ID, train.data$Alpha.ID, train.data[,response],
-                                         train.data$train.rawPredict, train.tolPredict)
-      colnames(trainResultsDF) <- c("ID", "Alpha.ID", "Response", "train.rawPredict", "train.tolPredict")
-      holdoutResultsDF <- cbind.data.frame(holdout.data$ID, holdout.data$Alpha.ID, holdout.data[,response], 
-                                           holdout.data$holdout.rawPredict, holdout.tolPredict)
-      colnames(holdoutResultsDF) <- c("ID", "Alpha.ID", "Response", "holdout.rawPredict", "holdout.tolPredict")
-      return(list(errorTib, trainResultsDF, holdoutResultsDF))
-      
-    } else{
-      # No tolerance to worry about
-      train.error <- mean(train.data[,response] != train.rawPredict)
-      holdout.error <- mean(holdout.data[,response] != holdout.rawPredict)
-      
-      # Aggregate Data for records and return results
-      errorTib <- tibble(train.error = train.error, valid.error = holdout.error)
-      trainResultsDF <- cbind.data.frame(train.data$ID, train.data$Alpha.ID, train.data[,response],
-                                         train.data$train.rawPredict)
-      colnames(trainResultsDF) <- c("ID", "Alpha.ID", "Response", "train.rawPredict")
-      holdoutResultsDF <- cbind.data.frame(holdout.data$ID, holdout.data$Alpha.ID, holdout.data[,response], 
-                                           holdout.data$holdout.rawPredict)
-      colnames(holdoutResultsDF) <- c("ID", "Alpha.ID", "Response", "holdout.rawPredict")
-      return(list(errorTib, trainResultsDF, holdoutResultsDF))
-    }
-    
-  }
-  # ---------------------------------------------------------------------------------------
-  
-  # Make a K from the percentage of rows
-  K <- floor(nrow(df)*kPerc)
-  # print(K)
-  
-  # Make index values of rows to keep track
-  #   ID: for cross validation
-  #   Alpha.ID: for original row order
-  ID <- sample(1:nrow(df))
-  Alpha.ID <- 1:nrow(df)
-  df$ID <- ID
-  df$Alpha.ID <- Alpha.ID
-  
-  # Prepare the folds being used
-  folds <- cut(ID, breaks = K, labels = F)
-  
-  # Initialize error to begin accumulation of fold error rates
-  errors <- tibble()
-  trainDF <- data.frame()
-  validDF <- data.frame()
-  # iterate on the number of folds
-  for (i in 1:K) {
-    holdout.indices <- which(folds == i, arr.ind = T)
-    folded.results <- fold.errors(df, holdout.indices, ...) # Call Helper method to get errors and predictions
-    folded.errors <- folded.results[[1]]
-    trainDF <- rbind(trainDF, folded.results[[2]])
-    validDF <- rbind(validDF, folded.results[[3]])
-    errors <- bind_rows(errors, folded.errors)
-  }
-  # Return results and let god sort them out
-  return(list(errors, df, trainDF, validDF))
-}
+
 
 
 # ---------------------------------------------------------------------
@@ -363,6 +273,18 @@ simpleAUC <- function(truePositiveR, falsePositiveR){
 # https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction#Description
 # -------------------------------------------------------------
 
+# Get the proportion of the first two columns passed in
+proportionGetter <-  function(x){
+  denom <- x[1] + x[2]
+  finalProp <- (x[2]/denom)
+  return(finalProp)
+}
+
+# Get the mean of the first two columns passed in
+meanGetter <-  function(x){
+  meanVal <- mean(x[1],x[2])
+  return(meanVal)
+}
 
 # Get the deciles for a vector of predicted values
 decileBuilder <- function(predictionVec){

@@ -44,9 +44,6 @@ p_load(boot)
 # --------------------------------------
 # Read Data
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-dustData_Reduced = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=','))
-dustData_Reduced <- dustData_Reduced[-1]
-dustData_Reduced$CASESTAT <- as.factor(dustData_Reduced$CASESTAT)
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
@@ -54,14 +51,12 @@ logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
 train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
 train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
-test_DustData <-  as.data.frame(read.csv('Data/Testing Set_0.1_May 25 2021.csv',header=T,sep=','))[-1]
-test_DustData$CASESTAT <- as.numeric(test_DustData$CASESTAT)
-test_DustData <- na.omit(test_DustData[,c(1:27, 30)])
 
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
 source("Script_Library.R")
+source("Model_Building_Library.R")
 
 
 
@@ -80,7 +75,7 @@ errorRateTable.test <- lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
 errorRateTable.test
 test.predValues <-as.numeric(as.character(predict(lda.fit, train_DustData)$class))
 
-confusionBuilder(train_DustData$CASESTAT, test.predValues, 0.5)
+rawConfusionBuilder(train_DustData$CASESTAT, test.predValues)
 
 ```
 

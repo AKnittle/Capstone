@@ -1,5 +1,5 @@
 ---
-title: "Capstone: Logistical Regression"
+title: "Capstone: Logistic Regression"
 author: "Andrew Knittle"
 date: "`r paste('Generated on', Sys.Date())`" 
 output: 
