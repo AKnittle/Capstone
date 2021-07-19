@@ -75,6 +75,7 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
     train.data <- df[-holdout.indices, ]
     holdout.data <- df[holdout.indices, ]
     # Fit data on the training data and make predictions
+    # TODO: Adjust to work with other models that don't use glm (randomForest for example)
     fit <- glm(formula, data = train.data, ...)
     # print(fit$family)
     
