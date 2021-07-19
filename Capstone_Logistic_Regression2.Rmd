@@ -169,7 +169,9 @@ validCrossPlot <- ggplot(validCross) +
 # trainCrossPlot
 validCrossPlot
 
-
+# TODO: Look at quantiles instead
+# quantile(validCross$holdout.rawPredict, probs = seq(.1, .9, by = .1))
+# New Bins (0.4508003 0.4971952 0.5256168 0.5506360 0.5727034 0.5993392 0.6217922 0.6488835 0.6816872)
 ggplot(decileProp) +
   aes(x = Decile, y = props) +
   geom_line(size = 0.5, colour = "#461112") +
