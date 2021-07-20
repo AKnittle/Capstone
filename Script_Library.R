@@ -336,8 +336,66 @@ decileBuilder <- function(predictionVec){
   
 }
 
+# Builds Decile plots made of bins from quantiles
+# Pass in Probabilities corresponding to their observed values 
+decilesByQuantiles <- function(predictedVals, observedVals){
+  # Make sure data passed in is numeric
+  observedVals <- as.numeric(as.character(observedVals))
+  # Get quantile bins
+  quantBins <- quantile(predictedVals, probs = seq(.1, .9, by = .1))
+  zoomA <- quantBins[1]
+  zoomB <- quantBins[9]
+  quantBins <- c(0,quantBins,1)
+  # aggregate values that fell into bins
+  resultDF <- cbind.data.frame(predictedVals, observedVals)
+  colnames(resultDF) <- c("predicted", "observed")
+  decileDF <- data.frame()
+  # Loop through the bins and build the decileDF
+  alpha=1
+  while(alpha < length(quantBins)){
+    # Get the end of the bin
+    beta = alpha + 1
+    # Get stats of what's between both ends of the bin
+    tempDF <- resultDF %>% filter(predicted > quantBins[alpha] & predicted < quantBins[beta])
+    proportion <- sum(tempDF$observed)/nrow(tempDF)
+    num0 <- nrow(tempDF) - sum(tempDF$observed)
+    num1 <- sum(tempDF$observed)
+    # Compile results of current bin
+    binDF <- cbind.data.frame(quantBins[alpha], quantBins[beta], num0, num1, proportion)
+    decileDF <- rbind(binDF, decileDF)
+    # Move onto the next index
+    alpha = beta
+  }
+  colnames(decileDF) <- c("Start", "End", "0", "1", "Proportion")
+  
+  # Build graph of Deciles 
+  decilePlot <- ggplot(decileDF) +
+    geom_abline(slope = 1, linetype = 2, color="red") + aes(x = Start, y = Proportion, colour = Proportion) +
+    geom_line(size = 0.8) + scale_color_viridis_c(option = "viridis", direction = 1) +
+    labs(x = "Deciles of Predicted Value", y = "Proportion", title = "Decile Plot") +
+    theme_bw() + ylim(0, 1) + xlim(0,1)
+  # Add horizontal lines to mark bin ends
+  for(h in decileDF$End){
+    decilePlot <- decilePlot + geom_vline(xintercept = h, linetype="dotted")
+  }
+  
+  # Build graph of Deciles (Zoomed In version)
+  decilePlotZoom <- ggplot(decileDF) +
+    geom_abline(slope = 1, linetype = 2, color="red") + aes(x = Start, y = Proportion, colour = Proportion) +
+    geom_line(size = 0.8) + scale_color_viridis_c(option = "viridis", direction = 1) +
+    labs(x = "Deciles of Predicted Value", y = "Proportion", title = "Decile Plot (Zoomed)") +
+    theme_bw() + ylim(0, 1) + xlim(zoomA, zoomB)
+  # Add horizontal lines to mark bin ends
+  for(h in decileDF$End){
+    decilePlotZoom <- decilePlotZoom + geom_vline(xintercept = h, linetype="dotted")
+  }
+  
+  
+  return(list(decileDF, decilePlot, decilePlotZoom))
+}
 
-
-
-
+# testObs <- sample(c(0,1), 100, replace = TRUE)
+# testProb <-round(runif(100),4)
+# testDeciles <- decilesByQuantiles(testProb, testObs)
+# testDeciles
 

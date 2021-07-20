@@ -104,20 +104,22 @@ logDustData$decilePredictedVals <- decilePredictedVals
 
 
 # Graph Result
-decile_casestatPlot <- ggplot(logDustData) +
-  aes(x = decilePredictedVals, fill = CASESTAT) +
-  geom_bar(position = "dodge") +
-  scale_fill_hue(direction = -1) +
-  labs(x = "Decile Values", y = "Count") +
-  theme_bw() +
-  theme(legend.position = "bottom") + 
-  scale_colour_discrete(drop = FALSE) +
-  scale_x_discrete(drop=FALSE)
-decile_casestatPlot
+# decile_casestatPlot <- ggplot(logDustData) +
+#   aes(x = decilePredictedVals, fill = CASESTAT) +
+#   geom_bar(position = "dodge") +
+#   scale_fill_hue(direction = -1) +
+#   labs(x = "Decile Values", y = "Count") +
+#   theme_bw() +
+#   theme(legend.position = "bottom") + 
+#   scale_colour_discrete(drop = FALSE) +
+#   scale_x_discrete(drop=FALSE)
+# decile_casestatPlot
 
 #TODO: Risk calibration: make part of the cross validation
 
 ```
+
+
 ```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 cvResult <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
@@ -145,6 +147,7 @@ colnames(decileProp) <- c("0", "1", "Decile")
 props <- apply(decileProp, 1, proportionGetter)
 decileProp$props <- props
 
+# ----------------------------------------------------------
 # Graph Result
 # trainCrossPlot <- ggplot(trainCross) +
 #   aes(x = decilePredictedVals, fill = Response) +
@@ -156,18 +159,19 @@ decileProp$props <- props
 #   scale_colour_discrete(drop = FALSE) +
 #   scale_x_discrete(drop=FALSE)
 
-validCrossPlot <- ggplot(validCross) +
-  aes(x = decilePredictedVals, fill = Response) +
-  geom_bar(position = "dodge") +
-  scale_fill_hue(direction = -1) +
-  labs(x = "Decile Values", y = "Count") +
-  theme_bw() +
-  theme(legend.position = "bottom") + 
-  scale_colour_discrete(drop = FALSE) +
-  scale_x_discrete(drop=FALSE)
+# validCrossPlot <- ggplot(validCross) +
+#   aes(x = decilePredictedVals, fill = Response) +
+#   geom_bar(position = "dodge") +
+#   scale_fill_hue(direction = -1) +
+#   labs(x = "Decile Values", y = "Count") +
+#   theme_bw() +
+#   theme(legend.position = "bottom") + 
+#   scale_colour_discrete(drop = FALSE) +
+#   scale_x_discrete(drop=FALSE)
 
 # trainCrossPlot
-validCrossPlot
+# validCrossPlot
+# ----------------------------------------------------------
 
 # TODO: Look at quantiles instead
 # quantile(validCross$holdout.rawPredict, probs = seq(.1, .9, by = .1))
@@ -178,6 +182,11 @@ ggplot(decileProp) +
   theme_bw() +
   ylim(0L, 1L)
 
+decileQuant <- decilesByQuantiles(validCross$holdout.rawPredict, validCross$Response)
+decileQuantDF <- decileQuant[[1]]
+decileQuant[[2]]
+decileQuant[[3]]
+decileQuantDF
 ```
 
 
