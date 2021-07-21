@@ -145,7 +145,7 @@ beforeCross <- crossForest[[2]]
 # trainCross <- cvResult[[3]]
 validCross <- crossForest[[4]]
 # trainCross$decilePredictedVals <- decileBuilder(trainCross$train.rawPredict)
-validCross$decilePredictedVals <- decileBuilder(validCross$holdout.rawPredict)
+rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
 
 # ROC and AUC graphs
 rocByLibrary(rfCancer_t100f5, logDustData, logDustData$CASESTAT, type="prob")
