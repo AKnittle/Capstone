@@ -99,8 +99,8 @@ tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(logDustData, stepwi
 ```{r Decile Graph, echo=FALSE, fig.cap= "Decile Graph", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 # Get Deciles
-decilePredictedVals <- decileBuilder(stepwiseModel2$fitted.values)
-logDustData$decilePredictedVals <- decilePredictedVals
+# decilePredictedVals <- decileBuilder(stepwiseModel2$fitted.values)
+# logDustData$decilePredictedVals <- decilePredictedVals
 
 #TODO: Risk calibration: make part of the cross validation
 
@@ -145,6 +145,9 @@ decileQuantDF <- decileQuant[[1]]
 decileQuant[[2]]
 decileQuant[[3]]
 decileQuantDF
+
+# TODO: Take average of p_prime within each bin for x-axis
+
 ```
 
 
