@@ -72,7 +72,7 @@ source("Script_Library.R")
 
 ```
 
-This is a second logistical regression report focusing on **Risk Prediction** instead of diagnosing on whether someone will develop cancer or not. We start the same way we did before of building a model (In this case Logistic using Stepwise-AIC)
+This is a second logistic regression report focusing on **Risk Prediction** instead of diagnosing on whether someone will develop cancer or not. We start the same way we did before of building a model (In this case Logistic using Stepwise-AIC)
 
 
 ```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
@@ -101,19 +101,6 @@ tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(logDustData, stepwi
 # Get Deciles
 decilePredictedVals <- decileBuilder(stepwiseModel2$fitted.values)
 logDustData$decilePredictedVals <- decilePredictedVals
-
-
-# Graph Result
-# decile_casestatPlot <- ggplot(logDustData) +
-#   aes(x = decilePredictedVals, fill = CASESTAT) +
-#   geom_bar(position = "dodge") +
-#   scale_fill_hue(direction = -1) +
-#   labs(x = "Decile Values", y = "Count") +
-#   theme_bw() +
-#   theme(legend.position = "bottom") + 
-#   scale_colour_discrete(drop = FALSE) +
-#   scale_x_discrete(drop=FALSE)
-# decile_casestatPlot
 
 #TODO: Risk calibration: make part of the cross validation
 
@@ -147,35 +134,6 @@ colnames(decileProp) <- c("0", "1", "Decile")
 props <- apply(decileProp, 1, proportionGetter)
 decileProp$props <- props
 
-# ----------------------------------------------------------
-# Graph Result
-# trainCrossPlot <- ggplot(trainCross) +
-#   aes(x = decilePredictedVals, fill = Response) +
-#   geom_bar(position = "dodge") +
-#   scale_fill_hue(direction = -1) +
-#   labs(x = "Decile Values", y = "Count") +
-#   theme_bw() +
-#   theme(legend.position = "bottom") + 
-#   scale_colour_discrete(drop = FALSE) +
-#   scale_x_discrete(drop=FALSE)
-
-# validCrossPlot <- ggplot(validCross) +
-#   aes(x = decilePredictedVals, fill = Response) +
-#   geom_bar(position = "dodge") +
-#   scale_fill_hue(direction = -1) +
-#   labs(x = "Decile Values", y = "Count") +
-#   theme_bw() +
-#   theme(legend.position = "bottom") + 
-#   scale_colour_discrete(drop = FALSE) +
-#   scale_x_discrete(drop=FALSE)
-
-# trainCrossPlot
-# validCrossPlot
-# ----------------------------------------------------------
-
-# TODO: Look at quantiles instead
-# quantile(validCross$holdout.rawPredict, probs = seq(.1, .9, by = .1))
-# New Bins (0.4508003 0.4971952 0.5256168 0.5506360 0.5727034 0.5993392 0.6217922 0.6488835 0.6816872)
 ggplot(decileProp) +
   aes(x = Decile, y = props) +
   geom_line(size = 0.5, colour = "#461112") +

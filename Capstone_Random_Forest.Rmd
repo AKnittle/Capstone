@@ -50,8 +50,9 @@ p_load(ROCR)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
+logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
-logDustData <- na.omit(logDustData)
+logDustData <- na.omit(logDustData[,c(1:27, 30)])
 
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
 #train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
@@ -60,8 +61,9 @@ train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
-source("Script_Library.R")
+source("CrossValidation_Library.R")
 source("Model_Building_Library.R")
+source("Script_Library.R")
 
 
 
@@ -136,7 +138,14 @@ rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t1
 # 
 # rfCancer_t100f15
 # rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f15$predicted)))
+crossForest <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
+                                      formula = as.formula("CASESTAT ~ ."), family="forest", ntree=100, mtry=5)
 
+beforeCross <- crossForest[[2]]
+# trainCross <- cvResult[[3]]
+validCross <- crossForest[[4]]
+# trainCross$decilePredictedVals <- decileBuilder(trainCross$train.rawPredict)
+validCross$decilePredictedVals <- decileBuilder(validCross$holdout.rawPredict)
 
 # ROC and AUC graphs
 rocByLibrary(rfCancer_t100f5, logDustData, logDustData$CASESTAT, type="prob")

@@ -71,16 +71,39 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
   # this function calculates the errors of a single fold using the fold as the holdout data
   fold.errors <- function(df, holdout.indices, ...) {
     
+    
+    # To make this more agnostic of modeling methods we need to see what
+    # kinds of models we have to break up things here. Get the name of 
+    # "..." and their values
+    args <- list(...)
+    for(i in 1:length(args)) {
+      assign(x = names(args)[i], value = args[[i]])
+    }
+    
     # Break up the data
     train.data <- df[-holdout.indices, ]
     holdout.data <- df[holdout.indices, ]
-    # Fit data on the training data and make predictions
-    # TODO: Adjust to work with other models that don't use glm (randomForest for example)
-    fit <- glm(formula, data = train.data, ...)
-    # print(fit$family)
     
-    # Aggregate the error
-    train.rawPredict <- fit$fitted.values
+    # Initialize values for later usage
+    fit <- NULL
+    train.rawPredict <- NULL
+    
+    # Fit data on the training data and make predictions
+    # Pick the model being used
+    if(family == "forest"){
+      # Build the Forest
+      fit <- randomForest(formula, data=train.data, ntree=ntree, mtry=mtry)
+      # Aggregate the error
+      train.rawPredict <- fit$predicted
+      
+    }else{
+      # Build the model
+      fit <- glm(formula, data = train.data, ...)
+      
+      # Aggregate the error
+      train.rawPredict <- fit$fitted.values
+    }
+    
     holdout.rawPredict <- predict(fit, holdout.data, type="response")
     train.data$train.rawPredict <- train.rawPredict
     holdout.data$holdout.rawPredict <- holdout.rawPredict

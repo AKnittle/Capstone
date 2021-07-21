@@ -120,7 +120,7 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
   return(list(confusionDF, RatesDF))
 }
 
-# IMPORTANT: Used for that return classified values, NOT probabilities
+# IMPORTANT: Used for returned classified values, NOT probabilities
 # Confusion Matrix Builder that takes in Observed Values, Fitted Values
 # Reminder: https://i.pinimg.com/originals/18/7f/82/187f82e15145fdce5e09059eebc92b34.png
 rawConfusionBuilder <- function(obs.response, fitted.response) {
