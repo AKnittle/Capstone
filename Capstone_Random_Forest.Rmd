@@ -141,14 +141,16 @@ rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t1
 crossForest <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
                                       formula = as.formula("CASESTAT ~ ."), family="forest", ntree=100, mtry=5)
 
-beforeCross <- crossForest[[2]]
-# trainCross <- cvResult[[3]]
-validCross <- crossForest[[4]]
-# trainCross$decilePredictedVals <- decileBuilder(trainCross$train.rawPredict)
-rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
+crossForest
+errorsDF <- crossForest[[1]]
+# beforeCross <- crossForest[[2]]
+# # trainCross <- cvResult[[3]]
+# validCross <- crossForest[[4]]
+# # trainCross$decilePredictedVals <- decileBuilder(trainCross$train.rawPredict)
+# rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
 
 # ROC and AUC graphs
-rocByLibrary(rfCancer_t100f5, logDustData, logDustData$CASESTAT, type="prob")
+# rocByLibrary(rfCancer_t100f5, logDustData, logDustData$CASESTAT, type="prob")
 
 ```
 

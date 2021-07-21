@@ -117,13 +117,20 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
       holdout.error <- mean(holdout.data[,response] != holdout.tolPredict)
       
       # Aggregate Data for records and return results
+      # Error Rate
       errorTib <- tibble(train.error = train.error, valid.error = holdout.error)
+      
+      # Training Set
       trainResultsDF <- cbind.data.frame(train.data$ID, train.data$Alpha.ID, train.data[,response],
                                          train.data$train.rawPredict, train.tolPredict)
       colnames(trainResultsDF) <- c("ID", "Alpha.ID", "Response", "train.rawPredict", "train.tolPredict")
+      
+      # Validation/Holdout Set
       holdoutResultsDF <- cbind.data.frame(holdout.data$ID, holdout.data$Alpha.ID, holdout.data[,response], 
                                            holdout.data$holdout.rawPredict, holdout.tolPredict)
       colnames(holdoutResultsDF) <- c("ID", "Alpha.ID", "Response", "holdout.rawPredict", "holdout.tolPredict")
+      
+      # Done with this Fold...
       return(list(errorTib, trainResultsDF, holdoutResultsDF))
       
     } else{
@@ -132,13 +139,20 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
       holdout.error <- mean(holdout.data[,response] != holdout.rawPredict)
       
       # Aggregate Data for records and return results
+      # Error Rate
       errorTib <- tibble(train.error = train.error, valid.error = holdout.error)
+      
+      # Training Set
       trainResultsDF <- cbind.data.frame(train.data$ID, train.data$Alpha.ID, train.data[,response],
                                          train.data$train.rawPredict)
       colnames(trainResultsDF) <- c("ID", "Alpha.ID", "Response", "train.rawPredict")
+      
+      # Validation/Holdout Set
       holdoutResultsDF <- cbind.data.frame(holdout.data$ID, holdout.data$Alpha.ID, holdout.data[,response], 
                                            holdout.data$holdout.rawPredict)
       colnames(holdoutResultsDF) <- c("ID", "Alpha.ID", "Response", "holdout.rawPredict")
+      
+      # Done with this Fold...
       return(list(errorTib, trainResultsDF, holdoutResultsDF))
     }
     
@@ -161,17 +175,17 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
   folds <- cut(ID, breaks = K, labels = F)
   
   # Initialize error to begin accumulation of fold error rates
-  errors <- tibble()
+  errors <-  data.frame()
   trainDF <- data.frame()
   validDF <- data.frame()
   # iterate on the number of folds
   for (i in 1:K) {
     holdout.indices <- which(folds == i, arr.ind = T)
     folded.results <- fold.errors(df, holdout.indices, ...) # Call Helper method to get errors and predictions
-    folded.errors <- folded.results[[1]]
+    folded.errors <- as.data.frame(folded.results[[1]])
     trainDF <- rbind(trainDF, folded.results[[2]])
     validDF <- rbind(validDF, folded.results[[3]])
-    errors <- bind_rows(errors, folded.errors)
+    errors <-  rbind(errors, folded.errors)
   }
   # Return results and let god sort them out
   return(list(errors, df, trainDF, validDF))
