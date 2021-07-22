@@ -100,6 +100,8 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
       # Aggregate the error
       train.rawPredict <- fit$predicted
       
+    }else if(){
+      
     }else{
       # Build the model
       fit <- glm(formula, data = train.data, ...)

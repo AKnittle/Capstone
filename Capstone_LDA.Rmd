@@ -46,7 +46,9 @@ p_load(boot)
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
+logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
+logDustData <- na.omit(logDustData[,c(1:27, 30)])
 
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
 train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
@@ -67,15 +69,20 @@ source("Model_Building_Library.R")
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-lda.formula <- formula(CASESTAT ~ DDE_1)
-lda.fit <- lda(lda.formula, data = train_DustData)
-lda.fit
-lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
-errorRateTable.test <- lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
-errorRateTable.test
-test.predValues <-as.numeric(as.character(predict(lda.fit, train_DustData)$class))
+# lda.formula <- formula(CASESTAT ~ DDE_1)
+# lda.fit <- lda(lda.formula, data = train_DustData)
+# lda.fit
+# lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
+# errorRateTable.test <- lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
+# errorRateTable.test
+# test.predValues <-as.numeric(as.character(predict(lda.fit, train_DustData)$class))
+# 
+# rawConfusionBuilder(train_DustData$CASESTAT, test.predValues)
 
-rawConfusionBuilder(train_DustData$CASESTAT, test.predValues)
+# Reattempting with my swiss army cross validator and with the full log data set
+lda.formula <- formula(CASESTAT ~ .)
+lda.fit <- lda(lda.formula, data = train_DustData)
+crossValidator.byKPercent(df = logDustData, response = "CASESTAT", formula = lda.formula, family="lda")
 
 ```
 
