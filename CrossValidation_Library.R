@@ -61,8 +61,12 @@ run.X.KFolds.TV.Error <- function(x, df, model, model.family, k){
   return(total.errors)
 }
 
-# Uses K as a Percentage to get folds of data, instead of a K number of folds
+
 # NOTE: can not take a 0% for kPerc
+# Uses K as a Percentage to get folds of data, instead of a K number of folds
+# This thing is a beast but here's what you need to know:
+# If you want to use this with glm pass in the family appropriate for it
+# otherwise for something like "random forest" pass in the family value "forest"
 crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NULL, ...) {
   
   
@@ -186,8 +190,6 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
     trainDF <- rbind(trainDF, folded.results[[2]])
     validDF <- rbind(validDF, folded.results[[3]])
     errors <-  rbind(errors, folded.errors)
-    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    print(errors)
   }
   # Return results and let god sort them out
   return(list(errors, df, trainDF, validDF))
@@ -214,4 +216,60 @@ error.rater <- function(trainSet, model.fit, givenK=10) {
   cvResult <- cv.glm(trainSet, glmfit = model.fit, cost = cost.fn, K = givenK)$delta[1]
   return(cvResult)
 }
+
+
+
+
+# ---------------------------------------------------------------------
+# Cross Validation Result Methods:
+# Helper methods that help plot/organize results
+
+# Pass in the Error DF you get back from running "crossValidator.byKPercent" (The first return value)
+crossError <- function(errorsDF){
+  
+  # Clean up Data
+  errorsDF$numFolds <- 1:nrow(errorsDF)
+  colnames(errorsDF) <- c("Training Error", "Validation Error", "numFolds")
+  
+  # Get average errors for this cross validation
+  avg.TrainCross <- mean(errorsDF$`Training Error`)
+  avg.ValidCross <- mean(errorsDF$`Validation Error`)
+  avg.ErrorDF <- cbind.data.frame(avg.TrainCross, avg.ValidCross)
+  colnames(errorsDF) <- c("Avg. Training Error", "Avg. Validation Error")
+  
+  # Prep for plotting
+  errorsDF$numFolds <- 1:nrow(errorsDF)
+  errorsDF <- reshape2::melt(errorsDF, id.vars = c("numFolds"))
+  colnames(errorsDF) <- c("numFolds", "Error.Type", "Avg.Error")
+  okRows <- which(errorsDF$Error.Type == "Avg. Training Error" | errorsDF$Error.Type == "Avg. Validation Error")
+  errorsDF <- errorsDF[okRows,]
+  
+  # Make Plots
+  errorLinePlot <- ggplot(errorsDF) +
+    aes(x = numFolds, y = Avg.Error, colour = Error.Type) +
+    geom_line(size = 0.8) + scale_color_hue(direction = 1) +
+    labs(x = "Number of Folds", y = "Average Error Rate",title = "Error Rate per Fold") +
+    theme_bw() + ylim(0L, 1L)
+  
+  errorBoxPlot <- ggplot(errorsDF) +
+    aes(x = "", y = Avg.Error, fill = Error.Type) +
+    geom_boxplot(shape = "circle") + scale_fill_hue(direction = 1) +
+    labs(x = "Error Types", y = "Average Error", title = "Avg. Error per Fold") +
+    theme_bw() + ylim(0L, 1L)
+  print(errorsDF)
+  
+  errorPlots <- ggarrange(errorLinePlot, errorBoxPlot, nrow = 2)
+  
+  return(list(avg.ErrorDF, errorPlots))
+}
+
+
+
+
+
+
+
+
+
+
 

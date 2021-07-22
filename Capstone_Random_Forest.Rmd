@@ -41,6 +41,7 @@ p_load(glmnet)
 p_load(leaps)
 p_load(partykit)
 p_load(randomForest)
+p_load(data.table)
 p_load(rfUtilities) # Used for cross validation
 # TODO: The package ROCR can ploxt ROC curves and calculate AUC... might want to revisit a few things
 p_load(ROCR)
@@ -143,7 +144,7 @@ crossForest <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT"
 
 crossForest
 errorsDF <- crossForest[[1]]
-errorsDF$NumFolds <- 1:nrow(errorsDF)
+crossError(errorsDF)
 
 # beforeCross <- crossForest[[2]]
 # # trainCross <- cvResult[[3]]
@@ -160,17 +161,17 @@ errorsDF$NumFolds <- 1:nrow(errorsDF)
 
 ```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE,  comment=FALSE, warning=FALSE}
 
-rf.cv <- rf.crossValidation(rfCancer_t100f5, train_DustData, p=0.10, n=10)
-
-# Plot cross validation versus model producers accuracy
-par(mfrow=c(1,2)) 
- plot(rf.cv, type = "cv", main = "CV producers accuracy")
- plot(rf.cv, type = "model", main = "Model producers accuracy")
-
-# Plot cross validation versus model oob
-par(mfrow=c(1,2)) 
- plot(rf.cv, type = "cv", stat = "oob", main = "CV oob error")
- plot(rf.cv, type = "model", stat = "oob", main = "Model oob error")	
+# rf.cv <- rf.crossValidation(rfCancer_t100f5, train_DustData, p=0.10, n=10)
+# 
+# # Plot cross validation versus model producers accuracy
+# par(mfrow=c(1,2)) 
+#  plot(rf.cv, type = "cv", main = "CV producers accuracy")
+#  plot(rf.cv, type = "model", main = "Model producers accuracy")
+# 
+# # Plot cross validation versus model oob
+# par(mfrow=c(1,2)) 
+#  plot(rf.cv, type = "cv", stat = "oob", main = "CV oob error")
+#  plot(rf.cv, type = "model", stat = "oob", main = "Model oob error")	
 
 ```
 
