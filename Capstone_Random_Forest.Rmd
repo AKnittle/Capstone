@@ -143,6 +143,7 @@ crossForest <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT"
 
 crossForest
 errorsDF <- crossForest[[1]]
+errorsDF$NumFolds <- 1:nrow(errorsDF)
 
 # beforeCross <- crossForest[[2]]
 # # trainCross <- cvResult[[3]]

@@ -186,6 +186,8 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
     trainDF <- rbind(trainDF, folded.results[[2]])
     validDF <- rbind(validDF, folded.results[[3]])
     errors <-  rbind(errors, folded.errors)
+    print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    print(errors)
   }
   # Return results and let god sort them out
   return(list(errors, df, trainDF, validDF))
