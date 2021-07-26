@@ -109,8 +109,18 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
       train.rawPredict <- as.numeric(as.character(predict(fit, train.data)$class))
       holdout.rawPredict <- as.numeric(as.character(predict(fit, holdout.data)$class))
       
+    }else if(family == "lasso"){
+      # Build the Lasso with passed in best Lambda
+      x <- model.matrix(formula, train.data)[,-1]
+      y <- as.factor(train.data[[response]])
+      
+      fit <- glmnet(x,y, alpha=1,lambda=bestLambda, family="binomial", thresh = 1e-12)
+      # Aggregate the error
+      train.rawPredict <- predict(fit, s = bestLambda, newx = x)
+      holdout.rawPredict <- predict(fit, s = bestLambda, newx = model.matrix(formula, holdout.data)[,-1])
+      
     }else{
-      # Build the model
+      # Build the model (Logistic Regression and others that use glm)
       fit <- glm(formula, data = train.data, ...)
       # Aggregate the error
       train.rawPredict <- fit$fitted.values

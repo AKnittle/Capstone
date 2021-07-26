@@ -46,131 +46,22 @@ p_load(leaps)
 # Read Data
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
-dustData = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=',')) # OG dataset
-dustData <- dustData[-1]
-dustData$CASESTAT <- as.factor(dustData$CASESTAT)
-dustData <- na.omit(dustData)
-#dustData <- na.omit(dustData[,c(1:27, 30)])
-
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
+logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
-
-train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
-train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
-train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
-
-
-train_DustData.long <- gather(train_DustData, Chemical, Amount, 1:27, factor_key = TRUE)
-dustData.long <- gather(dustData, Chemical, Amount, 1:27, factor_key = TRUE)
-na.omit(dustData.long)
-dustData.long$SITE <- as.factor(dustData.long$SITE)
-dustData.long$GENDER <- as.factor(dustData.long$GENDER)
-dustData.long$RACEG3 <- as.factor(dustData.long$RACEG3)
-dustData.long$ageGroup <- as.factor(floor(dustData.long$AGE_REF/10))
+logDustData <- na.omit(logDustData[,c(1:27, 30)])
 
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
 source("Script_Library.R")
+source("CrossValidation_Library.R")
 source("Model_Building_Library.R")
 
 
-
 ```
 
-```{r Interesting Plots, echo=FALSE, fig.cap= "Interesting Plots", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
-
-
-untouchedPlot <- ggplot(dustData.long) +
-  aes(
-    x = Chemical,
-    y = Amount,
-    fill = Chemical,
-    colour = Chemical
-  ) +
-  geom_boxplot(shape = "circle") +
-  scale_fill_hue(direction = 1) +
-  scale_color_hue(direction = 1) +
-  theme_minimal() +
-  facet_wrap(vars(CASESTAT))
-
-log2OGPlot <- ggplot(dustData.long) +
-  aes(
-    x = Chemical,
-    y = Amount,
-    fill = Chemical,
-    colour = Chemical
-  ) +
-  geom_boxplot(shape = "circle") +
-  scale_fill_hue(direction = 1) +
-  scale_color_hue(direction = 1) +
-  scale_y_continuous(trans = "log2") +
-  theme_bw() +
-  theme(legend.position = "bottom") +
-  facet_wrap(vars(CASESTAT))
-
-log2OGPlot.byChem <- ggplot(dustData.long) +
-  aes(
-    x = CASESTAT,
-    y = Amount,
-    fill = CASESTAT,
-    colour = CASESTAT
-  ) +
-  geom_boxplot(shape = "circle") +
-  scale_fill_hue(direction = 1) +
-  scale_color_hue(direction = 1) +
-  scale_y_continuous(trans = "log2") +
-  theme_minimal() +
-  facet_wrap(vars(Chemical))
-
-
-log10TrainPlot <- ggplot(train_DustData.long) +
-  aes(
-    x = Chemical,
-    y = Amount,
-    fill = Chemical,
-    colour = Chemical
-  ) +
-  geom_boxplot(shape = "circle") +
-  scale_fill_hue(direction = 1) +
-  scale_color_hue(direction = 1) +
-  scale_y_continuous(trans = "log10") + # Note the transform
-  theme_minimal() +
-  facet_wrap(vars(CASESTAT))
-
-log2TrainPlot.bySite <- ggplot(dustData.long) +
-  aes(
-    x = SITE,
-    y = Amount,
-    fill = Chemical,
-    colour = Chemical
-  ) +
-  geom_boxplot(shape = "circle") +
-  scale_fill_hue(direction = 1) +
-  scale_color_hue(direction = 1) +
-  scale_y_continuous(trans = "log2") +
-  theme_minimal() +
-  theme(legend.position = "bottom") +
-  facet_wrap(vars(CASESTAT))
-
-
-log2TrainPlot.byAgeGroup <- ggplot(dustData.long) +
-  aes(
-    x = CASESTAT,
-    fill = ageGroup,
-    colour = ageGroup,
-    weight = Amount
-  ) +
-  geom_bar(position = "dodge") +
-  scale_fill_hue(direction = 1) +
-  scale_color_hue(direction = 1) +
-  scale_y_continuous(trans = "log2") +
-  theme_bw() +
-  theme(legend.position = "bottom") +
-  facet_wrap(vars(Chemical))
-
-```
 
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
@@ -184,58 +75,45 @@ lassoResult <- NA
 # repeat the process several times until you get satisfying results
 if(!file.exists("lassoResult.rds")){
   lambda <- 10^seq(10,-2,length=30)
-  lassoResult <- buildLasso(train_DustData, "CASESTAT", lambda)
-  
+  lassoResult <- buildLasso(logDustData, "CASESTAT", lambda)
+
 }else{
   lassoResult <- readRDS(file = "lassoResult.rds")
 }
 
 coef(lassoResult$lasso.mod, s=lassoResult$bestLambda)
-predicted.classes <- ifelse(lassoResult$pred.lasso > 0.5, 0, 1)
-
-mean(predicted.classes == train_DustData$CASESTAT)
+# predicted.classes <- ifelse(lassoResult$pred.lasso > 0.5, 0, 1)
+# 
+# mean(predicted.classes == logDustData$CASESTAT)
 
 # Plot cross validation for lambda
 plot(lassoResult$cv.out)
 
 plot(lassoResult$lasso.mod, xvar = "lambda")
 
-```
-
-
-```{r Model Building Full Data, echo=FALSE, fig.cap= "Model Building Full Data", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
-
-# Initialize Lasso Results from method
-lassoResultFull <- NA
-
-lambda <- 10^seq(10,-2,length=30)
-lassoResultFull <- buildLasso(dustData, "CASESTAT", lambda)
-
-
-coef(lassoResultFull$lasso.mod, s=lassoResultFull$bestLambda)
-predicted.classes <- ifelse(lassoResultFull$pred.lasso > 0.5, 0, 1)
-
-mean(predicted.classes == train_DustData$CASESTAT)
-
-# Plot cross validation for lambda
-plot(lassoResultFull$cv.out)
-
-plot(lassoResultFull$lasso.mod, xvar = "lambda")
-
-
-rocFull <- rocBuilder(dustData$CASESTAT, lassoResultFull$pred.lasso, toleranceVec = seq(0,1,0.001))
-rocFull[[2]]
-rocDF <- rocFull[[1]]
-simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
+# rocFull <- rocBuilder(logDustData$CASESTAT, lassoResult$pred.lasso, toleranceVec = seq(0,1,0.001))
+# rocFull[[2]]
+# rocDF <- rocFull[[1]]
+# simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
 
 ```
 
 
-```{r Model Building 2, echo=FALSE, fig.cap= "Model Building 2", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 
-coef(lassoResult$lasso.mod, s=lassoResult$bestLambda)
+lassoFit <- lassoResult$lasso.mod
+bestLambda <- lassoResult$bestLambda
+lasso.formula <- as.formula("CASESTAT ~ D24_1 + DICAMBA_1 + BENZ_A_PYRENE_1 + PCB180_1 + CARBARYL_1 + A_CHLORDANE_1 + CHLORPYRIFOS_1 + DDE_1 + DDT_1 + DIAZINON_1 + METHOXYCHLOR_1 + PROPOXUR_1 + PENTACHLOROPHENOL_1")
 
+lassoCross <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
+                                        formula = lasso.formula, family="lasso",bestLambda=bestLambda, tol=0.5)
+# Print results of Lasso
+errorsDF <- lassoCross[[1]]
+crossError(errorsDF)
+validCross <- lassoCross[[4]]
+rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
 ```
 
 

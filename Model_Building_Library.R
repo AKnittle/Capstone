@@ -26,7 +26,7 @@ buildLasso <- function(dataset, dependentVar, lamVals, binaryResp=TRUE){
   cv.out=cv.glmnet(x,y,alpha=1, family="binomial", thresh = 1e-12)
   # This is the best lambda value found
   bestLambda=cv.out$lambda.min
-  print(bestLambda)
+  # print(bestLambda)
   
   # Calculate the Train error with the ridge regression model with the best lambda value
   pred.lasso <- predict(lasso.mod, s = bestLambda, newx = x)
