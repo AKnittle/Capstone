@@ -128,7 +128,7 @@ rfCancer_t100f15 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=1
 # ------------------------------------------------
 # OOB = Out Of Bag Error
 rfCancer_t100f5
-rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f5$predicted)))
+# rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f5$predicted)))
 
 # ------------------------------------------------
 # 
@@ -142,58 +142,15 @@ rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t1
 crossForest <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
                                       formula = as.formula("CASESTAT ~ ."), family="forest", ntree=100, mtry=5)
 
-crossForest
+# crossForest
 errorsDF <- crossForest[[1]]
 crossError(errorsDF)
 
-beforeCross <- crossForest[[2]]
+# beforeCross <- crossForest[[2]]
 # trainCross <- cvResult[[3]]
 validCross <- crossForest[[4]]
 # trainCross$decilePredictedVals <- decileBuilder(trainCross$train.rawPredict)
 rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
-
-```
-
-[I found this nifty cross validation function here that does proportional Cross Validation (ie. cross validate on 10%) which I'll use here](https://www.rdocumentation.org/packages/rfUtilities/versions/2.1-5/topics/rf.crossValidation)
-
-```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE,  comment=FALSE, warning=FALSE}
-
-# rf.cv <- rf.crossValidation(rfCancer_t100f5, train_DustData, p=0.10, n=10)
-# 
-# # Plot cross validation versus model producers accuracy
-# par(mfrow=c(1,2)) 
-#  plot(rf.cv, type = "cv", main = "CV producers accuracy")
-#  plot(rf.cv, type = "model", main = "Model producers accuracy")
-# 
-# # Plot cross validation versus model oob
-# par(mfrow=c(1,2)) 
-#  plot(rf.cv, type = "cv", stat = "oob", main = "CV oob error")
-#  plot(rf.cv, type = "model", stat = "oob", main = "Model oob error")	
-
-```
-
-
-
-```{r Model Building 2, echo=FALSE, fig.cap= "Model Building 2", out.height="100%", out.width="100%", warning=FALSE,  comment=FALSE, warning=FALSE}
-
-# rfCancer_t200f5 <- randomForest(CASESTAT ~ ., train_DustData, ntree=200, mtry=5)
-# rfCancer_t200f10 <- randomForest(CASESTAT ~ ., train_DustData, ntree=200, mtry=10)
-# rfCancer_t200f15 <- randomForest(CASESTAT ~ ., train_DustData, ntree=200, mtry=15)
-# 
-# # ------------------------------------------------
-# 
-# rfCancer_t200f5
-# rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t200f5$predicted)))
-# 
-# # ------------------------------------------------
-# 
-# rfCancer_t200f10
-# rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t200f10$predicted)))
-# 
-# # ------------------------------------------------
-# 
-# rfCancer_t200f15
-# rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t200f15$predicted)))
 
 ```
 

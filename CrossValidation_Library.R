@@ -264,7 +264,7 @@ crossError <- function(errorsDF){
     geom_boxplot(shape = "circle") + scale_fill_hue(direction = 1) +
     labs(x = "Error Types", y = "Average Error", title = "Avg. Error per Fold") +
     theme_bw() + ylim(0L, 1L)
-  print(errorsDF)
+  # print(errorsDF)
   
   errorPlots <- ggarrange(errorLinePlot, errorBoxPlot, nrow = 2)
   

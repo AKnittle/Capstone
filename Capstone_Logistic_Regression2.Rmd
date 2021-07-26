@@ -89,7 +89,7 @@ summary(stepwiseModel2)
 
 # Do Cross Validation
 
-tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(logDustData, stepwiseModel2, 10)))
+# tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(logDustData, stepwiseModel2, 10)))
 
 ```
 
