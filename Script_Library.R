@@ -336,6 +336,42 @@ decileBuilder <- function(predictionVec){
   
 }
 
+# Pass in Validation DF returned from Cross Validation
+plotDeciles <- function(df){
+  # Get probabilities
+  df$decilePredictedVals <- decileBuilder(df$holdout.rawPredict)
+  
+  # Make deciles
+  decileBins <- seq(0,1, 0.1)
+  decileProp <- data.frame()
+  # Make propoortions for each decile bin
+  for(i in decileBins){
+    tempSet <- subset(df, decilePredictedVals==i)
+    countPerDec <- table(tempSet$Response)
+    tempDF <- cbind.data.frame(countPerDec[[1]], countPerDec[[2]], i)
+    decileProp <- rbind(decileProp, tempDF)
+  }
+  colnames(decileProp) <- c("0", "1", "Decile")
+  
+  
+  props <- apply(decileProp, 1, proportionGetter)
+  decileProp$props <- props
+  
+  # Plot results
+  decilePlot <- ggplot(decileProp) +
+    geom_abline(slope = 1, linetype = 2, color="red") +
+    aes(x = Decile, y = props, colour = props) + geom_line(size = 0.8) + scale_color_viridis_c(option = "viridis", direction = 1) +
+    labs(x = "Deciles of Predicted Value", y = "Proportion", title = "Decile Plot") +
+    theme_bw() + ylim(0, 1) + xlim(0,1)
+  # Add horizontal lines to mark bin ends
+  for(h in decileBins){
+    decilePlot <- decilePlot + geom_vline(xintercept = h, linetype="dotted")
+  }
+  
+  return(decilePlot)
+  
+}
+
 # Builds Decile plots made of bins from quantiles
 # Pass in Probabilities corresponding to their observed values 
 decilesByQuantiles <- function(predictedVals, observedVals){
@@ -372,7 +408,7 @@ decilesByQuantiles <- function(predictedVals, observedVals){
   decilePlot <- ggplot(decileDF) +
     geom_abline(slope = 1, linetype = 2, color="red") + aes(x = Start, y = Proportion, colour = Proportion) +
     geom_line(size = 0.8) + scale_color_viridis_c(option = "viridis", direction = 1) +
-    labs(x = "Deciles of Predicted Value", y = "Proportion", title = "Decile Plot") +
+    labs(x = "Deciles of Predicted Value", y = "Proportion", title = "Decile Plot by Quantiles") +
     theme_bw() + ylim(0, 1) + xlim(0,1)
   # Add horizontal lines to mark bin ends
   for(h in decileDF$End){
@@ -383,7 +419,7 @@ decilesByQuantiles <- function(predictedVals, observedVals){
   decilePlotZoom <- ggplot(decileDF) +
     geom_abline(slope = 1, linetype = 2, color="red") + aes(x = Start, y = Proportion, colour = Proportion) +
     geom_line(size = 0.8) + scale_color_viridis_c(option = "viridis", direction = 1) +
-    labs(x = "Deciles of Predicted Value", y = "Proportion", title = "Decile Plot (Zoomed)") +
+    labs(x = "Deciles of Predicted Value", y = "Proportion", title = "Decile Plot by Quantiles (Zoomed)") +
     theme_bw() + ylim(0, 1) + xlim(zoomA, zoomB)
   # Add horizontal lines to mark bin ends
   for(h in decileDF$End){

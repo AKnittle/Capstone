@@ -117,7 +117,19 @@ rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
 ```
 
 
+```{r Risk Prediction, echo=FALSE, fig.cap= "Risk Prediction", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
+# Plot Deciles
+plotDeciles(validCross)
+
+# Plot Deciles by Quantiles
+decileQuant <- decilesByQuantiles(validCross$holdout.rawPredict, validCross$Response)
+decileQuantDF <- decileQuant[[1]]
+decileQuant[[2]]
+decileQuant[[3]]
+decileQuantDF
+
+```
 
 
 
