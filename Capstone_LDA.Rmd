@@ -50,14 +50,15 @@ logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 logDustData <- na.omit(logDustData[,c(1:27, 30)])
 
-train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
-train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
-train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
+# train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
+# train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
+# train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
 
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
 source("Script_Library.R")
+source("CrossValidation_Library.R")
 source("Model_Building_Library.R")
 
 
@@ -70,18 +71,18 @@ source("Model_Building_Library.R")
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 # lda.formula <- formula(CASESTAT ~ DDE_1)
-# lda.fit <- lda(lda.formula, data = train_DustData)
+# lda.fit <- lda(lda.formula, data = logDustData)
 # lda.fit
-# lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
-# errorRateTable.test <- lda.k.fold.validator2(train_DustData, "CASESTAT", 10)
+# lda.k.fold.validator2(logDustData, "CASESTAT", 10)
+# errorRateTable.test <- lda.k.fold.validator2(logDustData, "CASESTAT", 10)
 # errorRateTable.test
-# test.predValues <-as.numeric(as.character(predict(lda.fit, train_DustData)$class))
+# test.predValues <-as.numeric(as.character(predict(lda.fit, logDustData)$class))
 # 
-# rawConfusionBuilder(train_DustData$CASESTAT, test.predValues)
+# rawConfusionBuilder(logDustData$CASESTAT, test.predValues)
 
 # Reattempting with my swiss army cross validator and with the full log data set
 lda.formula <- formula(CASESTAT ~ .)
-lda.fit <- lda(lda.formula, data = train_DustData)
+lda.fit <- lda(lda.formula, data = logDustData)
 crossValidator.byKPercent(df = logDustData, response = "CASESTAT", formula = lda.formula, family="lda")
 
 ```

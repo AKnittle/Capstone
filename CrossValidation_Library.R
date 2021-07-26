@@ -91,6 +91,7 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
     # Initialize values for later usage
     fit <- NULL
     train.rawPredict <- NULL
+    holdout.rawPredict <- NULL
     
     # Fit data on the training data and make predictions
     # Pick the model being used
@@ -99,18 +100,23 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
       fit <- randomForest(formula, data=train.data, ntree=ntree, mtry=mtry)
       # Aggregate the error
       train.rawPredict <- fit$predicted
+      holdout.rawPredict <- predict(fit, holdout.data, type="response")
       
-    }else if(){
+    }else if(family == "lda"){
+      # Build the LDA
+      fit <- lda(lda.formula, data = train.data)
+      # Aggregate the error
+      train.rawPredict <- as.numeric(as.character(predict(fit, train.data)$class))
+      holdout.rawPredict <- as.numeric(as.character(predict(fit, holdout.data)$class))
       
     }else{
       # Build the model
       fit <- glm(formula, data = train.data, ...)
-      
       # Aggregate the error
       train.rawPredict <- fit$fitted.values
+      holdout.rawPredict <- predict(fit, holdout.data, type="response")
     }
     
-    holdout.rawPredict <- predict(fit, holdout.data, type="response")
     train.data$train.rawPredict <- train.rawPredict
     holdout.data$holdout.rawPredict <- holdout.rawPredict
     
