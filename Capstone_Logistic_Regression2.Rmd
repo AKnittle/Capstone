@@ -85,26 +85,9 @@ summary(stepwiseModel2)
 
 ```
 
-```{r Cross Validate Model, echo=FALSE, fig.cap= "Cross Validate Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-# Do Cross Validation
-
-# tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(logDustData, stepwiseModel2, 10)))
-
-```
 
 [A common test of model calibration is the Hosmer-Lemeshow test, which compares the proportion of observed outcomes across quantiles of predicted probabilities. Deciles are often used, but this is arbitrary. The Hosmer-Lemeshow test will provide a p-value, which reflects the probability that your null hypothesis – that there is no difference between the distribution of predicted and observed outcomes across quantiles – is correct (in other words, this is a situation in which a very large p-value should make the analyst quite pleased).](https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction#Description)
-
-
-```{r Decile Graph, echo=FALSE, fig.cap= "Decile Graph", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
-
-# Get Deciles
-# decilePredictedVals <- decileBuilder(stepwiseModel2$fitted.values)
-# logDustData$decilePredictedVals <- decilePredictedVals
-
-#TODO: Risk calibration: make part of the cross validation
-
-```
 
 
 ```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
@@ -113,6 +96,12 @@ cvResult <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT",
                                       formula = stepwiseModel2$formula, tol = 0.5, family="binomial")
 
 validCross <- cvResult[[4]]
+errorsDF <- cvResult[[1]]
+
+# Print results of Logistic
+crossError(errorsDF)
+rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
+
 # Plot Deciles
 plotDeciles(validCross)
 
