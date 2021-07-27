@@ -71,7 +71,7 @@ source("Script_Library.R")
 ```
 
 
-# What is Random Forest and how does it work?
+# Method
 
 ## Background: Decision Trees
 
@@ -100,18 +100,16 @@ In order to make a forest diverse, in other words making sure each tree has low 
 
 #### Bagging
 
-<Each tree samples with replacement>
+Each tree samples with replacement.
 
 #### Feature Randomness
 
-<Some get some features and others don't>
+Some get some features and others don't.
 
 ![Image name](https://miro.medium.com/max/1000/1*EemYMyOADnT0lJWSXmTDdg.jpeg)
 
 
-
-
-# Building the Model
+# Performance
 
 [I recommend reading this blog post for the intricate details and how to make your own Random Forest in R](https://www.blopig.com/blog/2017/04/a-very-basic-introduction-to-random-forests-using-r/)
 
@@ -154,6 +152,9 @@ rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
 
 ```
 
+
+
+# Conclusion
 
 
 
