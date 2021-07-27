@@ -105,6 +105,8 @@ $$
 
 Now that our output is in probability, between 0 and 1, the weights are no longer in linear form. The weights/coefficients are now in terms of log odds, "probability of event divided by probability of no event". This does make interpreting your model obviously pretty difficult since it's not a simple weighted value for coefficients.
 
+# Performance
+
 ```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 
@@ -116,20 +118,39 @@ summary(stepwiseModel2)
 ```
 
 
-
-# Performance
-
 ```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 cvResult <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
                                       formula = stepwiseModel2$formula, tol = 0.5, family="binomial")
 
+
+
 validCross <- cvResult[[4]]
 errorsDF <- cvResult[[1]]
+
+# Plot Results
+# logisticPlot <- ggplot(validCross) +
+#   aes(x = holdout.rawPredict, y = Response,colour = holdout.tolPredict) +
+#   geom_point(shape = "circle", size = 1.5) +
+#   scale_color_hue(direction = -1) +
+#   labs( x = "Predicted Probability",y = "Response (Cancer)",
+#     title = "Fitted Vs Observed Values",color = "Predicted Classification") +
+#   theme_bw() + xlim(0L, 1L) + ylim(0L, 1L)
+# logisticPlot
 
 # Print results of Logistic
 crossError(errorsDF)
 rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
+
+```
+
+
+# Conclusion
+
+
+# Risk Prediction
+
+```{r Risk Prediction, echo=FALSE, fig.cap= "Risk Prediction", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 # Plot Deciles
 plotDeciles(validCross)
@@ -146,7 +167,6 @@ decileQuantDF
 ```
 
 
-# Conclusion
 
 
 

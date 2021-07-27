@@ -62,6 +62,7 @@ source("Model_Building_Library.R")
 
 ```
 
+# Method
 
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
@@ -98,7 +99,7 @@ plot(lassoResult$lasso.mod, xvar = "lambda")
 
 ```
 
-
+# Perfomnace
 
 ```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
@@ -116,6 +117,9 @@ validCross <- lassoCross[[4]]
 rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
 ```
 
+# Conclusion
+
+# Risk Prediction
 
 ```{r Risk Prediction, echo=FALSE, fig.cap= "Risk Prediction", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 

@@ -63,7 +63,7 @@ source("Model_Building_Library.R")
 ```
 
 
-# How do Conditional Decision Trees Work
+# Method
 
 **NOTE:** This explanation will assume that the reader has a working understanding of how tree data structures work.
 
@@ -108,7 +108,7 @@ Once we have the best Independent Variable in terms of the root's left leaf node
 Now if a leaf node has a better impurity score than when trying to replace it with an independent variable then we leave it as is. We check the impurity score of the current leaf node, compare it to the candidate variable(s) and if none perform better then that's it.
 
 
-# Building the Model
+# Performance
 
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
@@ -121,6 +121,14 @@ print(treeModel)
 plot(treeModel)
 
 
+```
+
+
+# Conclusion
+
+From just looking at the plot above I can safely say this method is worthless, as the tree is just the root node. To demonstrate this fact I produced a Conditional Decision Tree with just dummy data below using the same techniques I used to produce the model shown above.
+
+```{r Dummy Set, echo=FALSE, fig.cap= "Dummy Set", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 Alpha <- sample(1:100, size = 1062, replace = TRUE)
 Beta <- sample(c(0,1), size = 1062, replace = TRUE)
 Delta <- sample(Beta, size = 1062, replace = TRUE)
@@ -151,10 +159,9 @@ dummyData$Xi <- as.factor(dummyData$Xi)
 testTree3 <- ctree(Xi ~ ., data = dummyData)
 print(testTree3)
 plot(testTree3)
-
 ```
 
-# Interpretting the Model
+As you can see we actually have a tree like structure with a root and a few leaf nodes. The root node for the first model I made just shows the average number of positive and negative cases. So all the other features did such a bad job that guessing just based on the average number of positive cases was better at predicting cases; in essence a just slightly better than a coin-flip. For that reason no further effort to measure its performance will be seriously considered.
 
 
 
