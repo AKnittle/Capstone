@@ -65,8 +65,21 @@ source("Model_Building_Library.R")
 
 ```
 
+# Method
 
+[Linear Discriminatory Analysis (LDA) focuses on maximizing the separability among known categories,](https://www.youtube.com/watch?v=azXCzI57Yfc&t=641s&ab_channel=StatQuestwithJoshStarmer) in this case it's positive and negative cancer results. This is done via a "cut", or plain, to create the separation. [LDA starts by creating a new axis that satisfies two criteria](https://youtu.be/azXCzI57Yfc?t=447):
 
+ * 1. Maximize the distance between means of each category.
+ 
+ * 2. Minimize the variation, or "scatter" $s^2$, within each category.
+ 
+This can be represented as $\frac{(\mu_1-\mu_2)^2}{s_1^2 + s_2^2}$. A large numerator and a small denominator is ideal. Once this new axis is created points are then projected onto it. This is done on each feature, where ["the linear combination of predictor variables that are used to form the LDA decision rule."](http://www.sthda.com/english/articles/36-classification-methods-essentials/146-discriminant-analysis-essentials-in-r/) In other words these variables are used to find the best linear combination of them to help best distinguish data across the two groups.
+
+An important quirk about LDA is that it only works on continuous independent variables because a categorical variable has no mean or variation, it's either one thing or another. This is perfect for the amount of chemicals detected as they are all continuous features. 
+
+It functions similarly to Principle Component Analysis (PCA) by creating new axes and reducing dimensions. PCA does this by looking at the variation of features while LDA looks at variation between categories and maximize their separation.
+
+# Performance
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
@@ -92,21 +105,22 @@ rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
 
 ```{r Final Model, echo=FALSE, fig.cap= "Final Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
-
+plot(lda.fit)
 lda.fit
 
+lda.data <- cbind(logDustData, predict(lda.fit)$x)
+ggplot(lda.data) +
+  aes(x = LD1, fill = CASESTAT) +
+  geom_histogram(bins = 30L) +
+  scale_fill_hue(direction = -1) +
+  theme_bw() +
+  facet_grid(rows = vars(CASESTAT))
+
+
 # ----------------------------------------
-rocFull <- rocBuilder(validCross$Response, validCross$holdout.rawPredict, toleranceVec = seq(0,1,0.001))
-rocFull[[2]]
-rocDF <- rocFull[[1]]
-simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
+# rocFull <- rocBuilder(validCross$Response, validCross$holdout.rawPredict, toleranceVec = seq(0,1,0.001))
+# rocFull[[2]]
+# rocDF <- rocFull[[1]]
+# simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
 
 ```
-
-## Method
-
-Linear Discriminatory Analysis (LDA) focuses on maximizing the separability among known categories, in this case it's positive and negative cancer results. This is done via a "cut", or plain, to create the separation. It functions similarly to Principle Component Analysis (PCA).
-
-An important feature about LDA is that it only works on continuous independent variables, so this is perfect for the amount of chemicals detected as they are numerical continuous features. These variables are used to find the best linear combination of them to help best distinguish data across two or more groups. However, LDA is normally used when working with more than 2 classes, or factors.
-
-
