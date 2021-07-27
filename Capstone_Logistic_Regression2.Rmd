@@ -75,51 +75,6 @@ source("Script_Library.R")
 This is a second logistic regression report focusing on **Risk Prediction** instead of diagnosing on whether someone will develop cancer or not. We start the same way we did before of building a model (In this case Logistic using Stepwise-AIC)
 
 
-```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
-
-
-# Using the full dataset with log transformed data
-stepwiseModel2 <- glm(CASESTAT ~ ., data = logDustData, family = "binomial") %>% stepAIC(trace = FALSE)
-cat("---------------------------------\n")
-summary(stepwiseModel2)
-
-```
-
-
-
-[A common test of model calibration is the Hosmer-Lemeshow test, which compares the proportion of observed outcomes across quantiles of predicted probabilities. Deciles are often used, but this is arbitrary. The Hosmer-Lemeshow test will provide a p-value, which reflects the probability that your null hypothesis – that there is no difference between the distribution of predicted and observed outcomes across quantiles – is correct (in other words, this is a situation in which a very large p-value should make the analyst quite pleased).](https://www.publichealth.columbia.edu/research/population-health-methods/risk-prediction#Description)
-
-
-```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
-
-cvResult <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
-                                      formula = stepwiseModel2$formula, tol = 0.5, family="binomial")
-
-validCross <- cvResult[[4]]
-errorsDF <- cvResult[[1]]
-
-# Print results of Logistic
-crossError(errorsDF)
-rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
-
-# Plot Deciles
-plotDeciles(validCross)
-
-# Plot Deciles by Quantiles
-decileQuant <- decilesByQuantiles(validCross$holdout.rawPredict, validCross$Response)
-decileQuantDF <- decileQuant[[1]]
-decileQuant[[2]]
-decileQuant[[3]]
-decileQuantDF
-
-# TODO: Take average of p_prime within each bin for x-axis
-
-```
-
-
-
-
-
 # Method
 
 Even though Logistic Regression is old hat it's not bad to review of how it works. A [great write up on Logistic Regression can be found here](https://christophm.github.io/interpretable-ml-book/logistic.html), but I will do my best to summarize without being too dense.
@@ -149,6 +104,55 @@ P(y^{i}=1)=\frac{1}{1+e^{-(\beta_0+\beta_1x_1^i+...+\beta_px_p^p)}}
 $$
 
 Now that our output is in probability, between 0 and 1, the weights are no longer in linear form. The weights/coefficients are now in terms of log odds, "probability of event divided by probability of no event". This does make interpreting your model obviously pretty difficult since it's not a simple weighted value for coefficients.
+
+```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+
+# Using the full dataset with log transformed data
+stepwiseModel2 <- glm(CASESTAT ~ ., data = logDustData, family = "binomial") %>% stepAIC(trace = FALSE)
+cat("---------------------------------\n")
+summary(stepwiseModel2)
+
+```
+
+
+
+# Performance
+
+```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+
+cvResult <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
+                                      formula = stepwiseModel2$formula, tol = 0.5, family="binomial")
+
+validCross <- cvResult[[4]]
+errorsDF <- cvResult[[1]]
+
+# Print results of Logistic
+crossError(errorsDF)
+rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
+
+# Plot Deciles
+plotDeciles(validCross)
+
+# Plot Deciles by Quantiles
+decileQuant <- decilesByQuantiles(validCross$holdout.rawPredict, validCross$Response)
+decileQuantDF <- decileQuant[[1]]
+decileQuant[[2]]
+decileQuant[[3]]
+decileQuantDF
+
+# TODO: Take average of p_prime within each bin for x-axis
+
+```
+
+
+# Conclusion
+
+
+
+
+
+
 
 
 
