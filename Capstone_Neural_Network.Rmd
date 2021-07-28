@@ -72,7 +72,26 @@ source("Script_Library.R")
 
 # Methods
 
-Neural Networks can be very powerful at prediction, but this comes at the cost of being nigh interpretable. 
+Neural Networks are designed to mimic to structure of the human brain in terms of individual neurons. Neural Networks can be very powerful at prediction, but this comes at the cost of being almost impossible to interpret and at times incredibly resource intensive. This section will do the best it can at describing how they work at a high level.
+
+## Structure
+
+[In the most basic understanding of a Neural Network](https://youtu.be/CqOfi41LfDw?t=228) it is a collection of nodes and connections between those nodes that form a graph. Each of these connections have weights assigned to them via a technique called **Backpropagation** (this will be explained later in this section). Each node then adds pieces of an output together to form a final output, think of each node adding a puzzle piece together to form the whole picture. These "puzzle pieces" in each  node are technically called an ["Activation Function"](https://www.youtube.com/watch?v=CqOfi41LfDw&ab_channel=StatQuestwithJoshStarmer); these are typically Sigmoid or ReLU Functions, but other functions can be considered based on the preference of the one building the network. 
+Neural Networks can have several input or output nodes, and several layers of internal nodes called *hidden nodes*.
+
+## Traversal of the Network
+
+For sake of being explainable we will assume that the Neural Network for this section has 1 Input Node, 1 Hidden Layer of 2 Nodes, and 1 Output Node. Also the functions for each of the connections will already be made through Backpropagation; we're traversing not building. 
+
+We start by plugging in a value $n_0$ into the the Input Node "Alpha". From Alpha we have two connections, each to a separate hidden node, H1 and H2 respectively. The connection from Alpha to H1 is processed through a function, say $n*0.5 + 1$; the multiplier is a ["weight" and the additive value is called a "bias"](https://www.youtube.com/watch?v=CqOfi41LfDw&ab_channel=StatQuestwithJoshStarmer). The value from this "connection function" is then used to **find the x-coordinate of H1's Activation Function**. Plugging in that $x$ value into the Activation Function gives us a new value, $n_1$.
+
+From the node H1 we traverse, with our new value $n_1$, to the output node "Omega". On that connection we apply another connection function let's say $n_1*(-0.25)$ to give us $n_{1f}$.
+
+However, before we reach Omega we need to do the same process as before but to H2. The connection function from Alpha to H2 will be $n*0.25 -1$, this value is plugged into H2's activation function and this gives us $n_2$. Since both connections have different values the [*range of the activation functions of H1 and H2 will be different.*](https://www.youtube.com/watch?v=CqOfi41LfDw&ab_channel=StatQuestwithJoshStarmer)
+
+We do the same procedure as before from H1 to Omega but this time from H2 to Omega. We'll have the connection function be $n_2*.75$ to give us $n_{2f}$.
+
+However before we plug $n_{1f}$ and $n_{2f}$ we need to sum them together as $n_{sum}$ and finally we apply one more connection function $n_{sum} + 2$ to give us $n_{final}$. $n_{final}$ is the final output, from Omega, for the value of $n$. Thus we have completed our traversal of the network.
 
 # Model Building
 
@@ -92,16 +111,15 @@ buildNetwork.deepnet(cancerVal, predictMatrix, c(5))
 ```
 
 
-
-
 ```{r Model Building wtih neuralnet, echo=FALSE, fig.cap= "Model Building with neuralnet", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 
-model.Nnet <- buildNetwork.neuralnet(logDustData, "CASESTAT", c(5))
-model.Nnet[[2]]
-plot(model.Nnet[[1]])
+# model.Nnet <- buildNetwork.neuralnet(logDustData, "CASESTAT", c(5))
+# model.Nnet[[2]]
+# plot(model.Nnet[[1]])
 ```
 
+# Conclusion
 
 
 
