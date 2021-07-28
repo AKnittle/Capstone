@@ -72,7 +72,7 @@ source("Script_Library.R")
 
 # Methods
 
-So what exactly are neural networks? 
+Neural Networks can be very powerful at prediction, but this comes at the cost of being nigh interpretable. 
 
 # Model Building
 
