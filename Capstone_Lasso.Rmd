@@ -64,6 +64,28 @@ source("Model_Building_Library.R")
 
 # Method
 
+[Lasso (aka Least Absolute Shrinkage and Selection Operator) is a type of regression that utilizes "shrinkage" to weed out variables that are not optimal for prediction.](https://www.statisticshowto.com/lasso-regression/) This is a great option to consider when the number of features is fairly large as it can reduce feature space significantly.
+
+Both Ridge and Lasso regression rely on Regularization. [Regularization](https://www.mygreatlearning.com/blog/understanding-of-lasso-regression/), is part of what makes Lasso so special as it helps counteract overfitting data by adding a penalty term, $\lambda$.
+
+## Ridge Regression
+
+Before diving into Lasso we should first talk about Ridge Regression since they both function very similarly to each other. So concepts used in one can be built on for the other.
+
+Ridge Regression is incredibly similar in terms of scope and function. The most notable difference is that while both Lasso and Ridge Regression both take in every feature used in prediction Lasso will outright eliminate variables by setting their coefficients to zero, while lasso will have their coefficients reduced to near zero. This will be explored further below.
+
+[Ridge works](https://youtu.be/Q81RR3yKn30?t=287) by trying to find the least sum of squared residuals and then adds $\lambda*slope^2$. The "$slope^2$" adds a penalty to the traditional Least Squares and $\lambda$ determines how severe that penalty will be. This leads to the trade off by sacrificing *more bias*, but *reducing variance*. Increase lambda enough and the slope can be asymptotically zero (*this will be important to remember later for Lasso*). This allows Ridge Regression lines to be less sensitive than a Least Squares Line. The bigger the lambda ($\lambda$) the response becomes less sensitive to weight. In order to find the best $\lambda$ we utilize *Cross Validation* to find which $\lambda$ gives the least amount of variance.
+
+[This concept can be applied to Logistic Regression; a binary response which is what we are interested in](https://youtu.be/Q81RR3yKn30?t=807). The difference between a logistic model and a linear model, is that the *Sum of the Likelihoods* are optimized instead of the Squared Residuals. This takes the form of $\text{the sum of the likelihoods} + \lambda*slope^2$. 
+
+These concepts scale out by taking the sum of squaring the all coefficients for all the variables and then multiplying that by $\lambda$ to give us our penalty. 
+
+
+## LASSO Regression
+
+As mentioned before [Lasso is incredibly similar to Ridge with one crucial difference](https://youtu.be/NGf0voTMlcs?t=172); the penalty is now $\text{the sum of the squared residuals} + \lambda*|slope|$. Finding the best $\lambda$ is the same via Cross Validation, and the trade off that comes with the penalty is the same. Both can be scaled the same way, and both can be used to predict binary responses.
+
+What applying absolute values to the coefficients for penalties allows is having the slope be zero, instead of asymptotically like Ridge. Therefore this will [eliminate terms/features that are considered "useless".](https://youtu.be/NGf0voTMlcs?t=411) This makes Lasso **slightly better** than Ridge at *reducing the variance in the model that contain a lot impractical variables*. Conversely Ridge does **slightly better** than Lasso *when most variables are considered useful.* For this project Lasso was chosen since there are a lot of variables in this data set and reducing the number of them would make interpretation much easier.
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
