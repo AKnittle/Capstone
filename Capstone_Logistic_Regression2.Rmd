@@ -128,6 +128,15 @@ cvResult <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT",
 validCross <- cvResult[[4]]
 errorsDF <- cvResult[[1]]
 
+# Print results of Logistic
+errorSummary <- crossError(errorsDF)
+quickDFPrint(errorSummary[[1]])
+errorSummary[[2]]
+
+confuseDF <- rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
+quickDFPrint(confuseDF[[1]])
+quickDFPrint(confuseDF[[2]])
+
 # Plot Results
 # logisticPlot <- ggplot(validCross) +
 #   aes(x = holdout.rawPredict, y = Response,colour = holdout.tolPredict) +
@@ -138,9 +147,6 @@ errorsDF <- cvResult[[1]]
 #   theme_bw() + xlim(0L, 1L) + ylim(0L, 1L)
 # logisticPlot
 
-# Print results of Logistic
-crossError(errorsDF)
-rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
 
 ```
 
@@ -160,7 +166,7 @@ decileQuant <- decilesByQuantiles(validCross$holdout.rawPredict, validCross$Resp
 decileQuantDF <- decileQuant[[1]]
 decileQuant[[2]]
 decileQuant[[3]]
-decileQuantDF
+quickDFPrint(decileQuantDF)
 
 # TODO: Take average of p_prime within each bin for x-axis
 
