@@ -164,6 +164,7 @@ decileQuant <- decilesByQuantiles(validCross$holdout.rawPredict, validCross$Resp
 decileQuantDF <- decileQuant[[1]]
 decileQuant[[2]]
 decileQuant[[3]]
+#TODO: why is that bottom decile's range nonsense???
 quickDFPrint(decileQuantDF)
 
 ```
