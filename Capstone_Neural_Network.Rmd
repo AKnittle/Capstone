@@ -143,11 +143,12 @@ Gradient Descent attempts to find the [minimum Residual Sum of Squares to build 
 
 Backpropagation normally starts on the last parameter in the network and then works backwards from there to fill in the previous parameters. So parameters are propagated backwards through the network, hence the name. However, we can start with having all the other parameters filled in but the last one, the final bias. We then calculate SSR on a range of values to find the what bias gives us the lowest SSR, but to save time we use Gradient Descent rather go through a massive range of values. 
 
-[To find the optimal bias we want to use Gradient Descent](https://youtu.be/IN2XmBhILt4?t=515), and that means we need to take the derivative of the SSR with respect to bias. Because the SSR are linked to bias by the predicted values the Chain Rule can be applied to solve for the derivative of the SSR with respect to bias.
+[To find the optimal bias we want to use Gradient Descent](https://youtu.be/IN2XmBhILt4?t=515), and that means we need to take the derivative of the SSR with respect to bias. Because the SSR are linked to bias by the predicted values the Chain Rule can be applied to solve for the derivative of the SSR with respect to bias. The Chain Rule says that the derivative of the SSR with respect to bias is the derivative of the SSR with respect to the Predicted values times the derivative of the Predicted values with respect to bias.
+
+<To be continued...>
 
 
-
-# Model Building
+# Model Building & Performance
 
 ```{r Model Building wtih deepnet, echo=FALSE, fig.cap= "Model Building with deepnet", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
@@ -175,6 +176,6 @@ buildNetwork.deepnet(cancerVal, predictMatrix, c(5))
 
 # Conclusion
 
-
+At the end of the day this was an impractical method to use with resources I had on hand. Also to be able to explain how the model worked would be really hard to explain. For this reason trying to use Neural Networks did not precede further then some exploratory test runs.
 
 
