@@ -432,6 +432,10 @@ decilesByQuantiles <- function(predictedVals, observedVals){
     decilePlotZoom <- decilePlotZoom + geom_vline(xintercept = h, linetype="dotted")
   }
   
+  # Tidy up the row names
+  decileRowNames <- rownames(decileDF)
+  decileRowNames <- c(decileRowNames[1:length(decileRowNames)-1], "~1%")
+  rownames(decileDF) <- decileRowNames
   
   return(list(decileDF, decilePlot, decilePlotZoom))
 }
