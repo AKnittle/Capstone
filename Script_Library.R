@@ -101,7 +101,8 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
     nrow()
   Observed.NO <- c(n.tn, n.fp) # True Negative, False Positive
   Observed.YES <- c(n.fn, n.tp) # False Negative, True Positive
-  confusionDF <- data.frame(Observed.NO, Observed.YES, row.names = c("Predicted.NO", "Predicted.YES"))
+  confusionDF <- data.frame(Observed.NO, Observed.YES, row.names = c("Predicted NO", "Predicted YES"))
+  colnames(confusionDF) <- c("Observed NO", "Observed YES")
   
   # error rate
   Error.Rate <- (n.fp + n.fn)/nrow(t)
@@ -117,6 +118,8 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
   True.Negative.Rate <- n.tn/(n.tn+n.fp) # Ideal is close to 1
   
   RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, True.Positive.Rate, True.Negative.Rate)
+  colnames(RatesDF) <- c("Error Rate", "False Positive Rate (Fall-Out)", "False Negative Rate (Miss Rate)", 
+                         "True Positive Rate (Sensitivity)", "True Negative Rate (Specificity)")
   return(list(confusionDF, RatesDF))
 }
 
@@ -143,7 +146,8 @@ rawConfusionBuilder <- function(obs.response, fitted.response) {
     nrow()
   Observed.NO <- c(n.tn, n.fp) # True Negative, False Positive
   Observed.YES <- c(n.fn, n.tp) # False Negative, True Positive
-  confusionDF <- data.frame(Observed.NO, Observed.YES, row.names = c("Predicted.NO", "Predicted.YES"))
+  confusionDF <- data.frame(Observed.NO, Observed.YES, row.names = c("Predicted NO", "Predicted YES"))
+  colnames(confusionDF) <- c("Observed NO", "Observed YES")
   
   # error rate
   Error.Rate <- (n.fp + n.fn)/nrow(t)
@@ -159,6 +163,8 @@ rawConfusionBuilder <- function(obs.response, fitted.response) {
   True.Negative.Rate <- n.tn/(n.tn+n.fn) # Ideal is close to 1
   
   RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, True.Positive.Rate, True.Negative.Rate)
+  colnames(RatesDF) <- c("Error Rate", "False Positive Rate (Fall-Out)", "False Negative Rate (Miss Rate)", 
+                         "True Positive Rate (Sensitivity)", "True Negative Rate (Specificity)")
   return(list(confusionDF, RatesDF))
 }
 
