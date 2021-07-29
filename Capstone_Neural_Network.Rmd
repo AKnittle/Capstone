@@ -137,7 +137,13 @@ Gradient Descent attempts to find the [minimum Residual Sum of Squares to build 
 
 [This can be done at once for a number of different terms.](https://youtu.be/sDv4f4s2SB8?t=950)
 
-### How it works
+### How Backpropagation Works
+
+[Backpropagation](https://youtu.be/IN2XmBhILt4?t=92) is what sets the weights (the multiplier) and biases (the additive) for connections between nodes. Backpropagation uses the Chain Rule to calculate derivatives and plugging the derivatives into Gradient Descent to optimize the parameters (weights and biases).
+
+Backpropagation normally starts on the last parameter in the network and then works backwards from there to fill in the previous parameters. So parameters are propagated backwards through the network, hence the name. However, we can start with having all the other parameters filled in but the last one, the final bias. We then calculate SSR on a range of values to find the what bias gives us the lowest SSR, but to save time we use Gradient Descent rather go through a massive range of values. 
+
+[To find the optimal bias we want to use Gradient Descent](https://youtu.be/IN2XmBhILt4?t=515), and that means we need to take the derivative of the SSR with respect to bias. Because the SSR are linked to bias by the predicted values the Chain Rule can be applied to solve for the derivative of the SSR with respect to bias.
 
 
 
