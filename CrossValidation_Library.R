@@ -253,6 +253,7 @@ crossError <- function(errorsDF){
   avg.TrainCross <- mean(errorsDF$`Training Error`)
   avg.ValidCross <- mean(errorsDF$`Validation Error`)
   avg.ErrorDF <- cbind.data.frame(avg.TrainCross, avg.ValidCross)
+  colnames(avg.ErrorDF) <- c("Avg. Training Error", "Avg. Validation Error")
   colnames(errorsDF) <- c("Avg. Training Error", "Avg. Validation Error")
   
   # Prep for plotting
