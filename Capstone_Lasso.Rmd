@@ -42,6 +42,9 @@ p_load(glm.predict)
 p_load(glmnet)
 p_load(leaps)
 
+# Formatting----------------------------
+
+
 # --------------------------------------
 # Read Data
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -89,7 +92,7 @@ These concepts scale out by taking the sum of squaring the all coefficients for 
 
 As mentioned before [Lasso is incredibly similar to Ridge with one crucial difference](https://youtu.be/NGf0voTMlcs?t=172); the penalty is now $\text{the sum of the squared residuals} + \lambda*|slope|$. Finding the best $\lambda$ is the same via Cross Validation, and the trade off that comes with the penalty is the same. Both can be scaled the same way, and both can be used to predict binary responses.
 
-What applying absolute values to the coefficients for penalties allows is having the slope be zero, instead of asymptotically like Ridge. Therefore this will [eliminate terms/features that are considered "useless".](https://youtu.be/NGf0voTMlcs?t=411) This makes Lasso **slightly better** than Ridge at *reducing the variance in the model that contain a lot impractical variables*. Conversely Ridge does **slightly better** than Lasso *when most variables are considered useful.* For this project Lasso was chosen since there are a lot of variables in this data set and reducing the number of them would make interpretation much easier.
+What applying absolute values to the coefficients for penalties allows is having the slope be zero, *instead of asymptotically like Ridge.* Therefore this will [eliminate terms/features that are considered "useless".](https://youtu.be/NGf0voTMlcs?t=411) This makes Lasso **slightly better** than Ridge at *reducing the variance in the model that contain a lot impractical variables*. Conversely Ridge does **slightly better** than Lasso *when most variables are considered useful.* For this project Lasso was chosen since there are a lot of variables in this data set and reducing the number of them would make interpretation much easier.
 
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
