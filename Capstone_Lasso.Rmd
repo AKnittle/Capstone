@@ -43,7 +43,8 @@ p_load(glmnet)
 p_load(leaps)
 
 # Formatting----------------------------
-
+p_load(kable)
+p_load(kableExtra)
 
 # --------------------------------------
 # Read Data
@@ -111,20 +112,18 @@ if(!file.exists("lassoResult.rds")){
   lassoResult <- readRDS(file = "lassoResult.rds")
 }
 
-coef(lassoResult$lasso.mod, s=lassoResult$bestLambda)
-# predicted.classes <- ifelse(lassoResult$pred.lasso > 0.5, 0, 1)
-# 
-# mean(predicted.classes == logDustData$CASESTAT)
+# Get the coefficients for Lasso and print
+coefLasso <- as.matrix(coef(lassoResult$lasso.mod, s=lassoResult$bestLambda))
+colnames(coefLasso) <- c("Coefficient")
+coefLasso <- subset(coefLasso, coefLasso[,1] != 0)
+
+quickDFPrint(coefLasso)
 
 # Plot cross validation for lambda
 plot(lassoResult$cv.out)
 
 plot(lassoResult$lasso.mod, xvar = "lambda")
 
-# rocFull <- rocBuilder(logDustData$CASESTAT, lassoResult$pred.lasso, toleranceVec = seq(0,1,0.001))
-# rocFull[[2]]
-# rocDF <- rocFull[[1]]
-# simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
 
 ```
 
@@ -141,9 +140,14 @@ lassoCross <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT",
                                         formula = lasso.formula, family="lasso",bestLambda=bestLambda, tol=0.5)
 # Print results of Lasso
 errorsDF <- lassoCross[[1]]
-crossError(errorsDF)
+errorSummary <- crossError(errorsDF)
+quickDFPrint(errorSummary[[1]])
+errorSummary[[2]]
+
 validCross <- lassoCross[[4]]
-rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
+confuseDF <- rawConfusionBuilder(validCross$Response, validCross$holdout.tolPredict)
+quickDFPrint(confuseDF[[1]])
+quickDFPrint(confuseDF[[2]])
 ```
 
 # Conclusion

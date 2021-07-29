@@ -441,3 +441,14 @@ decilesByQuantiles <- function(predictedVals, observedVals){
 # testDeciles <- decilesByQuantiles(testProb, testObs)
 # testDeciles
 
+
+# Formatting Methods---------------
+
+# Basically a quick wrapper for DFs 
+quickDFPrint <- function(df){
+  df %>%
+  kbl() %>%
+    kable_paper("hover", full_width = F)
+}
+
+
