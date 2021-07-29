@@ -93,6 +93,54 @@ We do the same procedure as before from H1 to Omega but this time from H2 to Ome
 
 However before we plug $n_{1f}$ and $n_{2f}$ we need to sum them together as $n_{sum}$ and finally we apply one more connection function $n_{sum} + 2$ to give us $n_{final}$. $n_{final}$ is the final output, from Omega, for the value of $n$. Thus we have completed our traversal of the network.
 
+## Backpropagation
+
+Before we talk about Backpropagation we need to discuss some foundational topics, the *Chain Rule* and *Gradient Descent*. Both subsections are a very brief overview of how each work.
+
+### Chain Rule
+
+In short [The Chain Rule](https://www.youtube.com/watch?v=wl1myxrtQHQ&ab_channel=StatQuestwithJoshStarmer) is like a transitive property of derivatives. 
+
+A very simple example is:
+$$
+\text{Given the functions: }
+\\
+y=2x \text{ -> } \frac{dy}{dx}=2
+\\
+w=5y \text{ -> } \frac{dw}{dy}=5
+\\
+\text{We can use the chain rule to get: }
+\\
+\frac{dw}{dy}*\frac{dy}{dx} \text{ -> } \frac{dw}{dx}=10 \text{ -> } w=10x 
+$$
+This simple example can scale out to more complex algorithms. Having a unit, in this case $y$, connecting between two other units. This is a much simpler approach than directly plugging in functions directly into other functions that are wrapped around them and taking that larger function's derivative. If you've taken Calculus course before then this was likely review. 
+
+The Chain Rule applies in machine learning, and thus Neural Networks, when we want to [reduce the Residual Sum of Squares](https://youtu.be/wl1myxrtQHQ?t=707). Essentially we want to find what we can get minimum Residual Sum of Squares (slope of 0), and different parts of the regression can be solved for by using the Chain Rule to solve for it.
+
+### Gradient Descent
+
+Gradient Descent attempts to find the [minimum Residual Sum of Squares to build out a statistical model by taking steps to zone in on the ideal value by taking steps that start large and get smaller as you get closer to the minimum.](https://www.youtube.com/watch?v=sDv4f4s2SB8&ab_channel=StatQuestwithJoshStarmer). Basically Gradient Descent utilizes the Chain Rule to build out the terms for the model, but instead of solving for the slope being 0 steps are (starting at random place) and then trying. Take a step, see what the slope is and take step depending on what the slope is; closer to 0 you take smaller steps. The changes in Step Sizes is called the "Learning Rate", $\text{Step Size}=\text{Model Term}*\text{Learning Rate}$. Most of the time a limit amount of steps are set in place because at some point it can be impractical.
+
+[In summary:](https://youtu.be/sDv4f4s2SB8?t=1333)
+
+* 1. We use the Loss Function to evaluate how well the line fits the data (Sum of Squared Residuals)
+
+* 2. We take the derivative of the Loss Function or the derivative of the Sum of Squares Residuals. 
+
+* 3. Then we take a random value of the term of the model and calculate the derivative when it's at said random variable.
+
+* 4. Get the Step Size, using the current slope multiplied by the Learning Rate
+
+* 5. Get the new term value by taking the old term value from Step 3 and subtracting that by the step size.
+
+* 6. Get the derivative of new term from Step 5 and repeat until converging at slope is 0 or meeting the maximum number of steps.
+
+[This can be done at once for a number of different terms.](https://youtu.be/sDv4f4s2SB8?t=950)
+
+### How it works
+
+
+
 # Model Building
 
 ```{r Model Building wtih deepnet, echo=FALSE, fig.cap= "Model Building with deepnet", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
