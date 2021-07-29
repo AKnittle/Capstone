@@ -267,13 +267,13 @@ crossError <- function(errorsDF){
   errorLinePlot <- ggplot(errorsDF) +
     aes(x = numFolds, y = Avg.Error, colour = Error.Type) +
     geom_line(size = 0.8) + scale_color_hue(direction = 1) +
-    labs(x = "Number of Folds", y = "Average Error Rate",title = "Error Rate per Fold") +
+    labs(x = "Number of Folds", y = "Error Rate",title = "Error Rate per Fold") +
     theme_bw() + ylim(0L, 1L)
   
   errorBoxPlot <- ggplot(errorsDF) +
     aes(x = "", y = Avg.Error, fill = Error.Type) +
     geom_boxplot(shape = "circle") + scale_fill_hue(direction = 1) +
-    labs(x = "Error Types", y = "Average Error", title = "Avg. Error per Fold") +
+    labs(x = "Error Types", y = "Error Rate", title = "Error Rate per Fold") +
     theme_bw() + ylim(0L, 1L)
   # print(errorsDF)
   
