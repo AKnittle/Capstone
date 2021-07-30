@@ -112,9 +112,9 @@ Now that our output is in probability, between 0 and 1, the weights are no longe
 
 # Using the full dataset with log transformed data
 stepwiseModel2 <- glm(CASESTAT ~ ., data = logDustData, family = "binomial") %>% stepAIC(trace = FALSE)
-cat("---------------------------------\n")
-summary(stepwiseModel2)
-
+stepwiseModel2$formula
+stepSummary <- summary(stepwiseModel2)
+quickDFPrint(stepSummary$coefficients)
 ```
 
 
