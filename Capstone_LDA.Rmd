@@ -103,11 +103,15 @@ ggplot(lda.data) +
   facet_grid(rows = vars(CASESTAT))
 
 # Print results of LDA
-# ldaCross
 errorsDF <- ldaCross[[1]]
-crossError(errorsDF)
+errorSummary <- crossError(errorsDF)
+quickDFPrint(errorSummary[[1]])
+errorSummary[[2]]
+
 validCross <- ldaCross[[4]]
-rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
+confuseDF <- rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
+quickDFPrint(confuseDF[[1]])
+quickDFPrint(confuseDF[[2]])
 
 
 ```

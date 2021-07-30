@@ -45,6 +45,9 @@ p_load(data.table)
 p_load(rfUtilities) # Used for cross validation
 # TODO: The package ROCR can ploxt ROC curves and calculate AUC... might want to revisit a few things
 p_load(ROCR)
+# Formatting----------------------------
+p_load(kable)
+p_load(kableExtra)
 
 # --------------------------------------
 # Read Data
@@ -55,10 +58,6 @@ logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 logDustData <- na.omit(logDustData[,c(1:27, 30)])
 
-train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
-#train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
-train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
-train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
@@ -120,12 +119,12 @@ Some get some features and others don't.
 # mtry is number of random features selected per tree
 # importance enables the algorithm to calculate variable importance (Not set here)
 rfCancer_t100f5 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=5)
-rfCancer_t100f10 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=10)
-rfCancer_t100f15 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=15)
+# rfCancer_t100f10 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=10)
+# rfCancer_t100f15 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=15)
 
 # ------------------------------------------------
 # OOB = Out Of Bag Error
-rfCancer_t100f5
+# rfCancer_t100f5
 # rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f5$predicted)))
 
 # ------------------------------------------------
@@ -142,13 +141,14 @@ crossForest <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT"
 
 # crossForest
 errorsDF <- crossForest[[1]]
-crossError(errorsDF)
+errorSummary <- crossError(errorsDF)
+quickDFPrint(errorSummary[[1]])
+errorSummary[[2]]
 
-# beforeCross <- crossForest[[2]]
-# trainCross <- cvResult[[3]]
 validCross <- crossForest[[4]]
-# trainCross$decilePredictedVals <- decileBuilder(trainCross$train.rawPredict)
-rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
+confuseDF <- rawConfusionBuilder(validCross$Response, validCross$holdout.rawPredict)
+quickDFPrint(confuseDF[[1]])
+quickDFPrint(confuseDF[[2]])
 
 ```
 

@@ -47,6 +47,9 @@ p_load(neuralnet)
 p_load(deepnet)
 p_load(mlbench)
 p_load(h2o)
+# Formatting----------------------------
+p_load(kable)
+p_load(kableExtra)
 
 # --------------------------------------
 # Read Data
@@ -161,7 +164,7 @@ predictMatrix = as.matrix(logDustData[,1:27], ncol=27) # Build Matrix of predict
 # Begin the training
 # hidden is the number of nodes in the first layer is x
 # nn <- nn.train(predictMatrix, cancerVal, hidden = c(5))
-buildNetwork.deepnet(cancerVal, predictMatrix, c(5))
+network <- buildNetwork.deepnet(cancerVal, predictMatrix, c(5))
 
 ```
 
