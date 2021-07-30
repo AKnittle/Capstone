@@ -114,7 +114,7 @@ Now that our output is in probability, between 0 and 1, the weights are no longe
 stepwiseModel2 <- glm(CASESTAT ~ ., data = logDustData, family = "binomial") %>% stepAIC(trace = FALSE)
 stepwiseModel2$formula
 stepSummary <- summary(stepwiseModel2)
-quickDFPrint(stepSummary$coefficients)
+quickDFPrint(as.data.frame(stepSummary$coefficients))
 ```
 
 

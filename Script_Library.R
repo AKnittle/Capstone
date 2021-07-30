@@ -450,9 +450,28 @@ decilesByQuantiles <- function(predictedVals, observedVals){
 
 # Basically a quick wrapper for DFs 
 quickDFPrint <- function(df){
-  df %>%
-  kbl() %>%
-    kable_paper("hover", full_width = F)
+  
+  # Make the rows pretty because I'm extra
+  dfColNames <- colnames(df)
+  if("Pr(>|z|)" %in% dfColNames){
+    # Colors significant terms that are significant
+    color.Sig05 <- which(df$`Pr(>|z|)` <= 0.05)
+    color.Sig1 <- which(df$`Pr(>|z|)` > 0.05 & df$`Pr(>|z|)` <= 0.1)
+    df %>%
+      kbl() %>%
+      kable_paper("hover", full_width = F) %>%
+      row_spec(color.Sig05, bold = T, color = "white", background = "blue")%>%
+      row_spec(color.Sig1, bold = T, color = "white", background = "green")
+    
+    # 
+    # cell_spec(`Pr(>|z|)`, color = ifelse(`Pr(>|z|)` <= 0.05, "white", "black"),
+    #           background = ifelse(`Pr(>|z|)` > 0.05 & `Pr(>|z|)` <= 0.1, "red", "white"))
+    
+  }else{
+    df %>%
+    kbl() %>%
+      kable_paper("hover", full_width = F)
+  }
 }
 
 
