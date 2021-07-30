@@ -29,13 +29,25 @@ p_load(psych)
 p_load(ggpubr)
 p_load(kableExtra)
 p_load(corrplot)
+# Formatting----------------------------
+p_load(kable)
+p_load(kableExtra)
+
 # Read Data
 setwd("C:/Users/aknit/Documents/Grad School/Capstone")
 dustData_Reduced = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=','))
 
+logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
+logDustData <- logDustData[-1]
+logDustData <- logDustData[-1]
+logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
+logDustData <- na.omit(logDustData[,c(1:27, 30)])
+
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
+source("CrossValidation_Library.R")
+source("Script_Library.R")
 
 ```
 
@@ -43,7 +55,7 @@ source("Exploratory_Support_Scripts.R")
 
 Before any analysis can be done we should explore the data to get a sense of what we're looking at. Since there are 333 variables in this dataset I'll be reducing the data set down to a few variables to help paint some broad strokes in my mind.
 
-```{r Exploration, echo=FALSE, fig.cap= "Exploration", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Exploration, echo=FALSE, fig.cap= "Exploration", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE,  warning=FALSE,  results='asis'}
 
 # TODO:
 # CASESTAT: 0 is control, 1 is case (contracted cancer)
@@ -113,7 +125,7 @@ table(dustData_Reduced$GENDER, dustData_Reduced$CASESTAT)
 ```
 
 
-```{r Exploration 2, echo=FALSE, fig.cap= "Exploration 2", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Exploration 2, echo=FALSE, fig.cap= "Exploration 2", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE,  warning=FALSE,  results='asis'}
 
 
 # Plot histograms for each chemical given in the list and differentiate between cases
@@ -148,48 +160,7 @@ chemicalCasesHist(chemList)
 ```
 
 
-
-
-TODO: What's up with Carbaryl and Diazinon
-
-
-
-
-5/6/21
-TODO:
-Look into CreateTableOne
-  Look at differences between groups
-  Start Modeling
-    Univariate Stat Regression
-    Build model; Logistical, LDA, Decision Trees (Conditional Decision Trees, Package Partykit->cpart), Lasso
-  Would be worth looking at coorelation between chems 
-    Coorelation Matrices
-    Use log+1 scale
-  Kernel Methods
-    Using kernel as a way to finding predictors
-    Kernal methods for mixtures
-      Bayesian (Biostatistics, multipollutent mixture)
-  Weighted Quantile Sum Regression
-    David Wheiler Paper (Check the Google Drive)
-      Sum score for all chems
-        Use the one score for logistic regression
-  HW: write up (Set Goals, How we do comparisons, etc.), EDA, Matrix correlation, table 
-    Know how we are going to compare models; cross validation, AIC, and others
-    Due: 5/11/21
-  
-
-```{r Exploration 3, echo=FALSE, fig.cap= "Exploration 3", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
-
-# Making log transformed values for all chem values 
-
-logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
-# logDustData <- dustData_Reduced
-# logDustData[chemList] <- lapply(logDustData[chemList], function(x) log10(x+1))
-logDustData <- logDustData[-1]
-extraVars <- as.vector(c("SITE", "GENDER", "AGE_REF", "RACEG3"))
-logDustData <- select(logDustData,-X)
-logDustData <- select(logDustData, -extraVars)
-#write.csv(logDustData, "logDustData_Reduced.csv")
+```{r Exploration 3, echo=FALSE, fig.cap= "Exploration 3", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE,  warning=FALSE,  results='asis'}
 
 
 # Plot correlations of just chems

@@ -41,6 +41,9 @@ p_load(glm.predict)
 p_load(glmnet)
 p_load(boot)
 p_load(pROC)
+# Formatting----------------------------
+p_load(kable)
+p_load(kableExtra)
 
 # --------------------------------------
 # Read Data
@@ -53,7 +56,9 @@ dustData <- na.omit(dustData[,c(1:27, 30)])
 
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
+logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
+logDustData <- na.omit(logDustData[,c(1:27, 30)])
 
 train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
 #train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
@@ -72,7 +77,7 @@ source("Script_Library.R")
 
 # Exploring the Data
 
-```{r Correlation Matrix, echo=FALSE, fig.cap= "Correlation Matrix", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Correlation Matrix, echo=FALSE, fig.cap= "Correlation Matrix", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 
 
 # Correlation matrix
@@ -90,7 +95,7 @@ As we can see there are many variables that are highly correlated. The goal now 
 
 # Finding the Right Variables
 
-```{r Group 1, echo=FALSE, fig.cap= "Group 1", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Group 1, echo=FALSE, fig.cap= "Group 1", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE, results='asis'}
 
 # Group 1:
 # BENZ_A_ANTHR, BENZ_B_FLUOR, BENZ_K_FLUOR, BENZ_A_PYRENE, CHRYSENE, DIBENZ_ANTHR, IDENO_PYR
@@ -130,7 +135,7 @@ Group1_Chems <- c("BENZ_A_ANTHR", "BENZ_B_FLUOR", "BENZ_K_FLUOR", "BENZ_A_PYRENE
 Group 1 Winner: CHRYSENE  Estimate -0.07203, P-Value: 0.519, AIC: 1464.7
 
 
-```{r Group 2, echo=FALSE, fig.cap= "Group 2", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Group 2, echo=FALSE, fig.cap= "Group 2", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Group 2:
@@ -154,7 +159,7 @@ Group2_Chems <- c("PCB105", "PCB138", "PCB153")
 Group 2 Winner: PCB105: Estimate: 0.1194, P-Value: 0.2650, AIC: 1463.8
 
 
-```{r Group 3, echo=FALSE, fig.cap= "Group 3", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Group 3, echo=FALSE, fig.cap= "Group 3", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Group 3:
 # PCB170, PCB180 <May need to look at other PCB's as well>
@@ -173,7 +178,7 @@ Group3_Chems <- c("PCB170", "PCB180")
 Group 3 Winner: PCB180: Estimate: 0.18404, P-Value: 0.082, AIC: 1462
 
 
-```{r Group 4, echo=FALSE, fig.cap= "Group 4", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Group 4, echo=FALSE, fig.cap= "Group 4", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Group 4:
 # A_CHLORDANE, G_CHLORDANE
@@ -193,7 +198,7 @@ Group4_Chems <- c("A_CHLORDANE", "G_CHLORDANE")
 Group 4 Winner: A_CHLORDANE: Estimate: 0.09623, P-Value: 0.253, AIC: 1463.8
 
 
-```{r Group 5, echo=FALSE, fig.cap= "Group 5", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Group 5, echo=FALSE, fig.cap= "Group 5", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Group 5:
 # DDE, DDT
@@ -213,7 +218,7 @@ Group5_Chems <- c("DDE", "DDT")
 Group 5 Winner: DDE: Estimate: 0.21830, P-Value: 0.0661, AIC: 1461.7
 
 
-```{r Group 6, echo=FALSE, fig.cap= "Group 6", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Group 6, echo=FALSE, fig.cap= "Group 6", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Group 6:
 # CISPERMETHRIN, TRANSPERMETHRIN
@@ -241,7 +246,7 @@ Group 6 Winner: TRANSPERMETHRIN: Estimate: -0.02564, P-Value: 0.618, AIC: 1464.8
 
 This model will be built using stepwise selection, using AIC as a criteria.
 
-```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 
 
 
@@ -256,7 +261,7 @@ summary(stepwiseModel1)
 
 Using the variables selected from before this is the current model
 
-```{r Building Model, echo=FALSE, fig.cap= "Building Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Building Model, echo=FALSE, fig.cap= "Building Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 
 model1 <- glm(CASESTAT ~ CHRYSENE_1 + PCB105_1 + PCB180_1 + A_CHLORDANE_1 + DDE_1 + TRANSPERMETHRIN_1, data = train_DustData, family = "binomial")
 cat("---------------------------------\n")
@@ -271,7 +276,7 @@ summary(model1)
 
 ## Handselected Model
 
-```{r Comparing Handselected Model Training, echo=FALSE, fig.cap= "Comparing Handselected Models Training", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Comparing Handselected Model Training, echo=FALSE, fig.cap= "Comparing Handselected Models Training", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 
 
 
@@ -291,7 +296,7 @@ tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(train_DustData, mod
 ## Stepwise Model
 
 
-```{r Comparing Stepwise Model Training, echo=FALSE, fig.cap= "Comparing Stepwise Models Training", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Comparing Stepwise Model Training, echo=FALSE, fig.cap= "Comparing Stepwise Models Training", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 
 # ----------------------------------------
 
@@ -319,7 +324,7 @@ rocByLibrary(stepwiseModel1, train_DustData, train_DustData$CASESTAT, type="resp
 
 The Stepwise Model performed best compare to "By Hand" model in terms of error rate for the test set using 10-Fold Cross Validation.
 
-```{r Final Model, echo=FALSE, fig.cap= "Final Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Final Model, echo=FALSE, fig.cap= "Final Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 
 
 summary(stepwiseModel1.test)

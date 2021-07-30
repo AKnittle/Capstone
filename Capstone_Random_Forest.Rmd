@@ -118,24 +118,24 @@ Some get some features and others don't.
 # ntree is the number of trees in the forest
 # mtry is number of random features selected per tree
 # importance enables the algorithm to calculate variable importance (Not set here)
-rfCancer_t100f5 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=5)
-# rfCancer_t100f10 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=10)
-# rfCancer_t100f15 <- randomForest(CASESTAT ~ ., train_DustData, ntree=100, mtry=15)
+rfCancer_t100f5 <- randomForest(CASESTAT ~ ., logDustData, ntree=100, mtry=5)
+# rfCancer_t100f10 <- randomForest(CASESTAT ~ ., logDustData, ntree=100, mtry=10)
+# rfCancer_t100f15 <- randomForest(CASESTAT ~ ., logDustData, ntree=100, mtry=15)
 
 # ------------------------------------------------
 # OOB = Out Of Bag Error
 # rfCancer_t100f5
-# rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f5$predicted)))
+# rawConfusionBuilder(logDustData$CASESTAT, as.numeric(as.character(rfCancer_t100f5$predicted)))
 
 # ------------------------------------------------
 # 
 # rfCancer_t100f10
-# rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f10$predicted)))
+# rawConfusionBuilder(logDustData$CASESTAT, as.numeric(as.character(rfCancer_t100f10$predicted)))
 # 
 # # ------------------------------------------------
 # 
 # rfCancer_t100f15
-# rawConfusionBuilder(train_DustData$CASESTAT, as.numeric(as.character(rfCancer_t100f15$predicted)))
+# rawConfusionBuilder(logDustData$CASESTAT, as.numeric(as.character(rfCancer_t100f15$predicted)))
 crossForest <- crossValidator.byKPercent(df = logDustData, response = "CASESTAT", 
                                       formula = as.formula("CASESTAT ~ ."), family="forest", ntree=100, mtry=5)
 
