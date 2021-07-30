@@ -455,22 +455,20 @@ quickDFPrint <- function(df){
   dfColNames <- colnames(df)
   if("Pr(>|z|)" %in% dfColNames){
     # Colors significant terms that are significant
-    color.Sig05 <- which(df$`Pr(>|z|)` <= 0.05)
-    color.Sig1 <- which(df$`Pr(>|z|)` > 0.05 & df$`Pr(>|z|)` <= 0.1)
-    for(i in color.Sig05){
-      df[i,4] <- cell_spec(df[i,4], color = "blue")
-    }
-    for(j in color.Sig1){
-      df[j,4] <- cell_spec(df[j,4], color = "green")
-    }
-    print(df %>%
+    color.Sig05 <- which(df[,4] <= 0.05)
+    color.Sig1 <- which(df[,4] > 0.05 & df[,4] <= 0.1)
+    # Clear out the intercept
+    color.Sig05 <- color.Sig05[! color.Sig05 %in% c(1)]
+    color.Sig1 <- color.Sig1[! color.Sig1 %in% c(1)]
+    df %>%
       kbl() %>%
-      kable_paper("hover", full_width = F))
-
+      kable_paper("hover", full_width = F) %>%
+      row_spec(color.Sig05, bold = T, color = "blue",)%>%
+      row_spec(color.Sig1, bold = T, color = "green")
   }else{
-    print(df %>%
+    df %>%
     kbl() %>%
-      kable_paper("hover", full_width = F))
+      kable_paper("hover", full_width = F)
   }
 }
 
