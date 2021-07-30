@@ -95,6 +95,9 @@ As mentioned before [Lasso is incredibly similar to Ridge with one crucial diffe
 
 What applying absolute values to the coefficients for penalties allows is having the slope be zero, *instead of asymptotically like Ridge.* Therefore this will [eliminate terms/features that are considered "useless".](https://youtu.be/NGf0voTMlcs?t=411) This makes Lasso **slightly better** than Ridge at *reducing the variance in the model that contain a lot impractical variables*. Conversely Ridge does **slightly better** than Lasso *when most variables are considered useful.* For this project Lasso was chosen since there are a lot of variables in this data set and reducing the number of them would make interpretation much easier.
 
+
+# Perfomnace
+
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 # Initialize Lasso Results from method
@@ -127,7 +130,6 @@ plot(lassoResult$lasso.mod, xvar = "lambda")
 
 ```
 
-# Perfomnace
 
 ```{r Cross Validation, echo=FALSE, fig.cap= "Cross Validation", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 

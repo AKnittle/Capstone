@@ -44,14 +44,13 @@ p_load(partykit)
 # --------------------------------------
 # Read Data
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
+logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
+logDustData <- na.omit(logDustData[,c(1:27, 30)])
 
-train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
-#train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
-train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
-train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
@@ -114,10 +113,10 @@ Now if a leaf node has a better impurity score than when trying to replace it wi
 ```{r Model Building, echo=FALSE, fig.cap= "Model Building", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
 
 # Build Model
-treeModel <- buildCDTree(train_DustData,"CASESTAT")
+treeModel <- buildCDTree(logDustData,"CASESTAT")
 
 # Print Model
-print(treeModel)
+# print(treeModel)
 plot(treeModel)
 
 
@@ -157,7 +156,6 @@ dummyData$Xi <- as.factor(dummyData$Xi)
 # plot(testTree2)
 
 testTree3 <- ctree(Xi ~ ., data = dummyData)
-print(testTree3)
 plot(testTree3)
 ```
 

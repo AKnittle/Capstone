@@ -42,15 +42,14 @@ p_load(glmnet)
 p_load(modelr)
 p_load(boot)
 p_load(pROC)
+# Formatting----------------------------
+p_load(kable)
+p_load(kableExtra)
+
 
 # --------------------------------------
 # Read Data
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
-
-dustData = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=',')) # OG dataset
-dustData <- dustData[-1]
-dustData$CASESTAT <- as.factor(dustData$CASESTAT)
-dustData <- na.omit(dustData[,c(1:27, 30)])
 
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
@@ -58,16 +57,13 @@ logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 logDustData <- na.omit(logDustData[,c(1:27, 30)])
 
-train_DustData <- as.data.frame(read.csv('Data/Training Set_0.9_May 25 2021.csv',header=T,sep=','))[-1]
-#train_DustData$CASESTAT <- as.numeric(train_DustData$CASESTAT)
-train_DustData$CASESTAT <- as.factor(train_DustData$CASESTAT)
-train_DustData <- na.omit(train_DustData[,c(1:27, 30)])
 
 # --------------------------------------
 # Read helper script
 source("Exploratory_Support_Scripts.R")
 source("CrossValidation_Library.R")
 source("Script_Library.R")
+
 
 
 ```
@@ -107,13 +103,13 @@ Now that our output is in probability, between 0 and 1, the weights are no longe
 
 # Performance
 
-```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE}
+```{r Stepwise Model, echo=FALSE, fig.cap= "Stepwise Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE, results='asis'}
 
 
 # Using the full dataset with log transformed data
 stepwiseModel2 <- glm(CASESTAT ~ ., data = logDustData, family = "binomial") %>% stepAIC(trace = FALSE)
-stepwiseModel2$formula
 stepSummary <- summary(stepwiseModel2)
+cat(paste(c(stepwiseModel2$terms[[2]], stepwiseModel2$terms[[1]], stepwiseModel2$terms[[3]]), collapse = ""))
 quickDFPrint(as.data.frame(stepSummary$coefficients))
 ```
 

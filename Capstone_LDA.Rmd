@@ -40,6 +40,9 @@ p_load(MASS)
 p_load(glm.predict)
 p_load(glmnet)
 p_load(boot)
+# Formatting----------------------------
+p_load(kable)
+p_load(kableExtra)
 
 # --------------------------------------
 # Read Data
