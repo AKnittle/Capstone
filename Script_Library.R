@@ -117,9 +117,16 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
   # true negative rate (Specificity)
   True.Negative.Rate <- n.tn/(n.tn+n.fp) # Ideal is close to 1
   
-  RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, True.Positive.Rate, True.Negative.Rate)
+  # Precision or Positive Predictive Value
+  PPV <- n.tp/(n.tp+n.fp)
+  # Negative Predictive Value (NPV)
+  NPV <- n.tn/(n.tn+n.fn)
+  
+  RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, 
+                        True.Positive.Rate, True.Negative.Rate, PPV, NPV)
   colnames(RatesDF) <- c("Error Rate", "False Positive Rate (Fall-Out)", "False Negative Rate (Miss Rate)", 
-                         "True Positive Rate (Sensitivity)", "True Negative Rate (Specificity)")
+                         "True Positive Rate (Sensitivity)", "True Negative Rate (Specificity)", 
+                         "Precision (PPV)", "Negative Predictive Value (NPV)")
   return(list(confusionDF, RatesDF))
 }
 
@@ -162,9 +169,16 @@ rawConfusionBuilder <- function(obs.response, fitted.response) {
   # true negative rate
   True.Negative.Rate <- n.tn/(n.tn+n.fn) # Ideal is close to 1
   
-  RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, True.Positive.Rate, True.Negative.Rate)
+  # Precision or Positive Predictive Value
+  PPV <- n.tp/(n.tp+n.fp)
+  # Negative Predictive Value (NPV)
+  NPV <- n.tn/(n.tn+n.fn)
+  
+  RatesDF <- data.frame(Error.Rate, False.Positive.Rate, False.Negative.Rate, 
+                        True.Positive.Rate, True.Negative.Rate, PPV, NPV)
   colnames(RatesDF) <- c("Error Rate", "False Positive Rate (Fall-Out)", "False Negative Rate (Miss Rate)", 
-                         "True Positive Rate (Sensitivity)", "True Negative Rate (Specificity)")
+                         "True Positive Rate (Sensitivity)", "True Negative Rate (Specificity)", 
+                         "Precision (PPV)", "Negative Predictive Value (NPV)")
   return(list(confusionDF, RatesDF))
 }
 
