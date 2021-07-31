@@ -1850,7 +1850,7 @@ pre code {
 
 <h1 class="title toc-ignore">Capstone: Lasso</h1>
 <h4 class="author">Andrew Knittle</h4>
-<h4 class="date">Generated on 2021-07-30</h4>
+<h4 class="date">Generated on 2021-07-31</h4>
 
 </div>
 
@@ -1884,6 +1884,10 @@ pre code {
 <h2>LASSO Regression</h2>
 <p>As mentioned before <a href="https://youtu.be/NGf0voTMlcs?t=172">Lasso is incredibly similar to Ridge with one crucial difference</a>; the penalty is now <span class="math inline">\(\text{the sum of the squared residuals} + \lambda*|slope|\)</span>. Finding the best <span class="math inline">\(\lambda\)</span> is the same via Cross Validation, and the trade off that comes with the penalty is the same. Both can be scaled the same way, and both can be used to predict binary responses.</p>
 <p>What applying absolute values to the coefficients for penalties allows is having the slope be zero, <em>instead of asymptotically like Ridge.</em> Therefore this will <a href="https://youtu.be/NGf0voTMlcs?t=411">eliminate terms/features that are considered “useless”.</a> This makes Lasso <strong>slightly better</strong> than Ridge at <em>reducing the variance in the model that contain a lot impractical variables</em>. Conversely Ridge does <strong>slightly better</strong> than Lasso <em>when most variables are considered useful.</em> For this project Lasso was chosen since there are a lot of variables in this data set and reducing the number of them would make interpretation much easier.</p>
+</div>
+</div>
+<div id="perfomnace" class="section level1">
+<h1>Perfomnace</h1>
 <table class=" lightable-paper lightable-hover" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2021,10 +2025,6 @@ Model Building
 Model Building
 </p>
 </div>
-</div>
-</div>
-<div id="perfomnace" class="section level1">
-<h1>Perfomnace</h1>
 <table class=" lightable-paper lightable-hover" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
@@ -2109,6 +2109,12 @@ True Positive Rate (Sensitivity)
 <th style="text-align:right;">
 True Negative Rate (Specificity)
 </th>
+<th style="text-align:right;">
+Precision (PPV)
+</th>
+<th style="text-align:right;">
+Negative Predictive Value (NPV)
+</th>
 </tr>
 </thead>
 <tbody>
@@ -2121,6 +2127,12 @@ True Negative Rate (Specificity)
 </td>
 <td style="text-align:right;">
 0.78125
+</td>
+<td style="text-align:right;">
+0.21875
+</td>
+<td style="text-align:right;">
+0.8267717
 </td>
 <td style="text-align:right;">
 0.6255319

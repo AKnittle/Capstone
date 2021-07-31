@@ -116,8 +116,8 @@ crossValidator.byKPercent <- function(df, response, formula, kPerc=0.10, tol=NUL
       
       fit <- glmnet(x,y, alpha=1,lambda=bestLambda, family="binomial", thresh = 1e-12)
       # Aggregate the error
-      train.rawPredict <- predict(fit, s = bestLambda, newx = x)
-      holdout.rawPredict <- predict(fit, s = bestLambda, newx = model.matrix(formula, holdout.data)[,-1])
+      train.rawPredict <- predict(fit, s = bestLambda, newx = x, type="response")
+      holdout.rawPredict <- predict(fit, s = bestLambda, newx = model.matrix(formula, holdout.data)[,-1], type="response")
       
     }else{
       # Build the model (Logistic Regression and others that use glm)
