@@ -34,14 +34,13 @@ p_load(kable)
 p_load(kableExtra)
 
 # Read Data
-setwd("C:/Users/aknit/Documents/Grad School/Capstone")
-dustData_Reduced = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=','))
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
-logDustData <- logDustData[-1]
+# logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
-logDustData <- na.omit(logDustData[,c(1:27, 30)])
+logDustData <- na.omit(logDustData)
 
 # --------------------------------------
 # Read helper script
@@ -69,10 +68,10 @@ Before any analysis can be done we should explore the data to get a sense of wha
 
 # Make a vector of variables we're interested in
 # exploratoryVars <- as.vector(c("SITE", "CASESTAT", "GENDER", "AGE_REF", "EDUCG3", "RACEG3"))
-# dustData_Reduced <- dustData %>% select(-contains("_10"))
-# dustData_Reduced <- dustData_Reduced %>% select(contains("_1"))
+# logDustData <- dustData %>% select(-contains("_10"))
+# logDustData <- logDustData %>% select(contains("_1"))
 # 
-chemList <- colnames(dustData_Reduced)[2:27]
+chemList <- colnames(logDustData)[2:27]
 
 # Just to make this a bit more portable in the future I'll make this a method for
 # getting dataframe data with specific vars
@@ -81,14 +80,14 @@ chemList <- colnames(dustData_Reduced)[2:27]
 #   return(result)
 # }
 
-#dustData_Reduced <- getDustVars(varVec = exploratoryVars)
-# dustData_Reduced$AGE_REF <- dustData$AGE_REF
-# dustData_Reduced$SITE <- as.factor(dustData$SITE)
-# dustData_Reduced$CASESTAT <- as.factor(dustData$CASESTAT)
-# dustData_Reduced$GENDER <- as.factor(dustData$GENDER)
-# dustData_Reduced$RACEG3 <- as.factor(dustData$RACEG3)
+#logDustData <- getDustVars(varVec = exploratoryVars)
+# logDustData$AGE_REF <- dustData$AGE_REF
+# logDustData$SITE <- as.factor(dustData$SITE)
+# logDustData$CASESTAT <- as.factor(dustData$CASESTAT)
+# logDustData$GENDER <- as.factor(dustData$GENDER)
+# logDustData$RACEG3 <- as.factor(dustData$RACEG3)
 
-# write.csv(dustData_Reduced, "dustData_Reduced.csv")
+# write.csv(logDustData, "logDustData.csv")
 
 
 # --------------------------------------------------------
@@ -96,22 +95,23 @@ chemList <- colnames(dustData_Reduced)[2:27]
 
 
 # Histogram of Age Groups with Gender
-ggplot(dustData_Reduced) +
- aes(x = AGE_REF, fill = GENDER, colour = GENDER) +
- geom_histogram(bins = 30L) +
- scale_fill_hue() +
- scale_color_hue() +
- labs(x = "Age", y = "Count", title = "Histogram of Age with Gender") +
- theme_minimal()
+ggplot(logDustData) +
+  aes(x = AGE_REF, fill = as.factor(GENDER)) +
+  geom_histogram(bins = 30L) +
+  scale_fill_hue(direction = 1) +
+  labs(x = "Age",y = "Count",title = "Histogram of Ages of Participants", fill = "Gender", caption = "Female=1, Male=2") + 
+  scale_x_continuous(breaks=seq(10,100,10), limits = c(10, 80)) +
+  theme_bw()
 
 
 # Casetat per Site
 # No drastic differences noted
-ggplot(dustData_Reduced) +
+ggplot(logDustData) +
  aes(x = CASESTAT, fill = CASESTAT) +
  geom_bar() +
- scale_fill_hue() +
+ scale_fill_hue(direction = -1) +
  theme_minimal() +
+ labs(x = "Cases",y = "Count",title = "Histogram of Cases per Location", fill = "Casestat") +
  facet_wrap(vars(SITE))
 
 # Controls
@@ -120,7 +120,7 @@ ggplot(dustData_Reduced) +
 # -----------
 # Female: 0
 # Male: 1
-table(dustData_Reduced$GENDER, dustData_Reduced$CASESTAT)
+# table(logDustData$GENDER, logDustData$CASESTAT)
 
 ```
 
@@ -134,10 +134,10 @@ chemicalCasesHist <- function(chems){
   chemPlots <- c()
   for(i in chems){
     
-    chemGraph <- ggplot(dustData_Reduced) +
-     aes(x = log10(dustData_Reduced[,i] +1), fill = CASESTAT) +
+    chemGraph <- ggplot(logDustData) +
+     aes(x = log10(logDustData[,i] +1), fill = CASESTAT) +
      geom_histogram(bins = 30L) +
-     scale_fill_hue() +
+     scale_fill_hue(direction = -1) +
      ylim(0, 650) +
      labs(y = "Count", title = "Chemical Per Case", x=i) +
      theme_minimal()
@@ -197,20 +197,20 @@ resize.win <- function(Width=6, Height=6)
 }
 
 # Plot the correlation plot
-terms=names(logModel1$coefficients)[-1] #Extract the variable names
-ind=which(names(logDustData)%in%terms) #Get the column numbers of the variables in the model
-pairPlot1 <- pairs.panels(logDustData[ind],
-             method = "pearson", # correlation method
-             hist.col = "darkorchid",
-             density = TRUE, # show density plots
-             ellipses = TRUE) # show correlation ellipses
-
-resize.win(10,10)
-pairPlot1
+# terms=names(logModel1$coefficients)[-1] #Extract the variable names
+# ind=which(names(logDustData)%in%terms) #Get the column numbers of the variables in the model
+# pairPlot1 <- pairs.panels(logDustData[ind],
+#              method = "pearson", # correlation method
+#              hist.col = "darkorchid",
+#              density = TRUE, # show density plots
+#              ellipses = TRUE) # show correlation ellipses
+# 
+# resize.win(10,10)
+# pairPlot1
 
 # Correlation matrix
-cor(dustData_Reduced[1:26], use="complete.obs")
-corrplot(cor(dustData_Reduced[2:26], use="complete.obs"))
+# cor(logDustData[1:26], use="complete.obs")
+corrplot(cor(logDustData[2:26], use="complete.obs"))
 
 ```
 

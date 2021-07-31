@@ -308,13 +308,13 @@ confusion.result
 tibble(Model=c("Logistic Model"), Error_Rate = c(error.rater(train_DustData, stepwiseModel1, 10)))
 # TODO: Out of curiosity throw everything into a logistic model
 
-rocFull <- rocBuilder(train_DustData$CASESTAT, stepwiseModel1$fitted.values, toleranceVec = seq(0,1,0.001))
-rocFull[[2]]
-rocDF <- rocFull[[1]]
-simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
-
-
-rocByLibrary(stepwiseModel1, train_DustData, train_DustData$CASESTAT, type="response")
+# rocFull <- rocBuilder(train_DustData$CASESTAT, stepwiseModel1$fitted.values, toleranceVec = seq(0,1,0.001))
+# rocFull[[2]]
+# rocDF <- rocFull[[1]]
+# simpleAUC(rocDF$`True Positive Rate`, rocDF$`False Positive Rate`)
+# 
+# 
+# rocByLibrary(stepwiseModel1, train_DustData, train_DustData$CASESTAT, type="response")
 
 ```
 
@@ -327,13 +327,13 @@ The Stepwise Model performed best compare to "By Hand" model in terms of error r
 ```{r Final Model, echo=FALSE, fig.cap= "Final Model", out.height="100%", out.width="100%", warning=FALSE, comment=FALSE, warning=FALSE,  results='asis'}
 
 
-summary(stepwiseModel1.test)
-
-# ----------------------------------------
-
-
-confusion.result
-errorRateTable
+# summary(stepwiseModel1.test)
+# 
+# # ----------------------------------------
+# 
+# 
+# confusion.result
+# errorRateTable
 ```
 
 CASESTAT ~ 1.4191 + (0.1780)D24 + (0.5941)BENZ_K_FLUOR + (-3.3352)BENZ_A_PYRENE + (-2.9114)CHRYSENE + 
