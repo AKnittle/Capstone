@@ -107,14 +107,14 @@ confusionBuilder <- function(obs.response, fitted.probability, passedTolerance) 
   # error rate
   Error.Rate <- (n.fp + n.fn)/nrow(t)
   
-  # false positive rate (Fall Out)
-  False.Positive.Rate <- n.fp/(n.tn+n.fp) # Ideal is close to 0
-  # false negative rate (Miss Rate)
+  # false positive rate (fall-out)
+  False.Positive.Rate <- n.fp/(n.fp+n.tn) # Ideal is close to 0
+  # false negative rate (miss rate)
   False.Negative.Rate <- n.fn/(n.fn+n.tp) # Ideal is close to 0
   
-  # true positive rate (Sensitivity)
+  # true positive rate (sensitivity, recall, hit rate)
   True.Positive.Rate <- n.tp/(n.tp+n.fn) # Ideal is close to 1
-  # true negative rate (Specificity)
+  # true negative rate (specificity, selectivity)
   True.Negative.Rate <- n.tn/(n.tn+n.fp) # Ideal is close to 1
   
   # Precision or Positive Predictive Value
@@ -159,15 +159,15 @@ rawConfusionBuilder <- function(obs.response, fitted.response) {
   # error rate
   Error.Rate <- (n.fp + n.fn)/nrow(t)
   
-  # false positive rate
-  False.Positive.Rate <- n.fp/(n.tn+n.fp) # Ideal is close to 0
-  # false negative rate
+  # false positive rate (fall-out)
+  False.Positive.Rate <- n.fp/(n.fp+n.tn) # Ideal is close to 0
+  # false negative rate (miss rate)
   False.Negative.Rate <- n.fn/(n.fn+n.tp) # Ideal is close to 0
   
-  # true positive rate
-  True.Positive.Rate <- n.tp/(n.tp+n.fp) # Ideal is close to 1
-  # true negative rate
-  True.Negative.Rate <- n.tn/(n.tn+n.fn) # Ideal is close to 1
+  # true positive rate (sensitivity, recall, hit rate)
+  True.Positive.Rate <- n.tp/(n.tp+n.fn) # Ideal is close to 1
+  # true negative rate (specificity, selectivity)
+  True.Negative.Rate <- n.tn/(n.tn+n.fp) # Ideal is close to 1
   
   # Precision or Positive Predictive Value
   PPV <- n.tp/(n.tp+n.fp)
