@@ -111,8 +111,7 @@ reactable(
   defaultColDef = colDef(
     style = function(value) {
       if (!is.numeric(value)) return()
-      normalized <- (value - min(finalDF)) / (max(finalDF) - min(finalDF))
-      color <- BuYlRd(normalized)
+      color <- BuYlRd(value)
       list(background = color)
     },
     format = colFormat(digits = 4),
