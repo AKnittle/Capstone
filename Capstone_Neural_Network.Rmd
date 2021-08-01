@@ -148,7 +148,7 @@ Backpropagation normally starts on the last parameter in the network and then wo
 
 [To find the optimal bias we want to use Gradient Descent](https://youtu.be/IN2XmBhILt4?t=515), and that means we need to take the derivative of the SSR with respect to bias. Because the SSR are linked to bias by the predicted values the Chain Rule can be applied to solve for the derivative of the SSR with respect to bias. The Chain Rule says that the derivative of the SSR with respect to bias is the derivative of the SSR with respect to the Predicted values times the derivative of the Predicted values with respect to bias.
 
-<To be continued...>
+[If you wish to learn more I highly recommend Josh Starmer's video on the subject.](https://www.youtube.com/watch?v=iyn2zdALii8&ab_channel=StatQuestwithJoshStarmer)
 
 
 # Model Building & Performance
