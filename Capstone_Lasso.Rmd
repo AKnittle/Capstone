@@ -120,6 +120,9 @@ coefLasso <- as.matrix(coef(lassoResult$lasso.mod, s=lassoResult$bestLambda))
 colnames(coefLasso) <- c("Coefficient")
 coefLasso <- subset(coefLasso, coefLasso[,1] != 0)
 
+print("The best lambda is:")
+cat(bestLambda)
+
 quickDFPrint(coefLasso)
 
 # Plot cross validation for lambda
