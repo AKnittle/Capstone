@@ -1,5 +1,5 @@
 ---
-title: "Capstone: Lasso"
+title: "Capstone: Summary"
 author: "Andrew Knittle"
 date: "`r paste('Generated on', Sys.Date())`" 
 output: 
