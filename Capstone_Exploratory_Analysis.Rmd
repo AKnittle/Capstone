@@ -36,9 +36,15 @@ p_load(kableExtra)
 # Read Data
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
+dustDustData = as.data.frame(read.csv('Data/dustData_Reduced.csv',header=T,sep=','))
+dustDustData <- dustDustData[-1]
+# dustDustData <- dustDustData[-1]
+dustDustData$CASESTAT <- as.factor(dustDustData$CASESTAT)
+dustDustData <- na.omit(dustDustData)
+
 logDustData = as.data.frame(read.csv('Data/logDustData_Reduced.csv',header=T,sep=','))
 logDustData <- logDustData[-1]
-# logDustData <- logDustData[-1]
+logDustData <- logDustData[-1]
 logDustData$CASESTAT <- as.factor(logDustData$CASESTAT)
 logDustData <- na.omit(logDustData)
 
@@ -134,8 +140,16 @@ chemicalCasesHist <- function(chems){
   chemPlots <- c()
   for(i in chems){
     
-    chemGraph <- ggplot(logDustData) +
-     aes(x = log10(logDustData[,i] +1), fill = CASESTAT) +
+    chemGraph <- ggplot(dustDustData) +
+     aes(x = dustDustData[,i], fill = CASESTAT) +
+     geom_histogram(bins = 30L) +
+     scale_fill_hue(direction = -1) +
+     ylim(0, 650) +
+     labs(y = "Count", title = "Chemical Per Case", x=i) +
+     theme_minimal()
+    
+    chemGraphLog <- ggplot(logDustData) +
+     aes(x = logDustData[,i], fill = CASESTAT) +
      geom_histogram(bins = 30L) +
      scale_fill_hue(direction = -1) +
      ylim(0, 650) +
@@ -143,7 +157,9 @@ chemicalCasesHist <- function(chems){
      theme_minimal()
      # facet_wrap(vars(CASESTAT))
     
-    print(chemGraph)
+    compareGraph <- ggarrange(chemGraph, chemGraphLog, nrow=2)
+    
+    print(compareGraph)
     # chemPlots <- c(chemPlots, chemGraph)
     
   }
