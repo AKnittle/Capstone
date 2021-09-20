@@ -27,7 +27,6 @@ p_load(ggplot2)
 p_load(dplyr)
 p_load(psych)
 p_load(ggpubr)
-p_load(kableExtra)
 p_load(corrplot)
 # Formatting----------------------------
 p_load(kable)
